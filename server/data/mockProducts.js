@@ -122,4 +122,4 @@ const mockProducts = [
   }
 ];
 
-module.exports = mockProducts;
+window.mockProducts = mockProducts;
