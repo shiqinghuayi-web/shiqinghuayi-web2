@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://10.36.111.114:3000'; 
+const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
