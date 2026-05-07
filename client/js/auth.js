@@ -1,6 +1,6 @@
 // 這裡填入你 B 電腦 VM 的 IP 位址
 // 如果連手機熱點，請確認這是在同一個網段內的 IP
-const API_BASE_URL = 'http://10.36.111.114:3000'; 
+const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
 
 document.getElementById('login-form')?.addEventListener('submit', async e => {
   e.preventDefault();
