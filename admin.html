@@ -4,23 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>拾情畫憶｜商品管理</title>
-  <link rel="icon" href="/client/assets/images/111.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="client/assets/images/111.png" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/css/style.css" />
+  <link rel="stylesheet" href="client/css/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="container header-wrap">
-      <a class="brand" href="/index.html">拾情畫憶</a>
+      <a class="brand logo-brand" href="index.html">
+        <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo">
+      </a>
       <nav class="main-nav">
-        <a href="/index.html">前台首頁</a>
-        <a href="/products.html">商品頁</a>
-        <a href="/admin.html" class="active">商品管理</a>
+        <a href="index.html">前台首頁</a>
+        <a href="products.html">商品頁</a>
+        <a href="admin.html" class="active">商品管理</a>
       </nav>
     </div>
   </header>
+
   <main class="section page-top">
     <div class="container">
       <section class="page-hero">
@@ -28,6 +29,7 @@
         <h1>商品管理</h1>
         <p>即使是後台，也保留同一套品牌視覺與更乾淨的管理版面。</p>
       </section>
+
       <div class="admin-layout">
         <section class="panel-card">
           <div class="panel-head">
@@ -38,19 +40,20 @@
           </div>
           <form id="admin-product-form" class="form-grid">
             <input class="input" type="text" name="name" placeholder="商品名稱" required />
-            <input class="input" type="text" name="slug" placeholder="商品代稱 slug" required />
+            <input class="input" type="text" name="slug" placeholder="商品代稱 slug (例如: honey-red-oolong)" required />
             <input class="input" type="number" name="price" placeholder="價格" required />
             <input class="input" type="number" name="stock" placeholder="庫存" required />
-            <input class="input full" type="text" name="imageUrl" placeholder="圖片網址（可留空）" />
+            <input class="input full" type="text" name="imageUrl" placeholder="圖片路徑 (例如: client/assets/images/product1.jpg)" />
             <textarea class="input textarea full" name="description" placeholder="商品描述"></textarea>
-            <button class="btn full" type="submit">新增商品</button>
+            <button class="btn full" type="submit">確認新增商品</button>
           </form>
         </section>
+
         <section class="panel-card">
           <div class="panel-head">
             <div>
               <span class="section-label">Current Items</span>
-              <h2>目前商品</h2>
+              <h2>目前資料庫商品</h2>
             </div>
           </div>
           <div id="admin-product-list" class="product-grid"></div>
@@ -58,28 +61,22 @@
       </div>
     </div>
   </main>
+
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-      <a class="brand logo-brand footer-logo" href="/index.html">
-          <img src="/client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+      <a class="brand logo-brand footer-logo" href="index.html">
+        <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
       </a>
-      </div>
       <div>
         <h4>網站導覽</h4>
-        <a href="/products.html">商品列表</a>
-        <a href="/cart.html">購物車</a>
-        <a href="/account.html">會員中心</a>
-        <a href="/admin.html">商品管理</a>
-      </div>
-      <div>
-        <h4>客服資訊</h4>
-        <p>服務時間：週一至週五 10:00 - 18:00</p>
-        <p>Email：service@shiqinghuayi.com</p>
-        <p>Tel：02-1234-5678</p>
+        <a href="products.html">商品列表</a>
+        <a href="cart.html">購物車</a>
+        <a href="admin.html">商品管理</a>
       </div>
     </div>
   </footer>
-  <script src="/client/js/admin.js"></script>
+
+  <script src="client/js/mockProductsFrontend.js"></script>
+  <script src="client/js/admin.js"></script>
 </body>
 </html>
