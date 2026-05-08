@@ -1261,3 +1261,85 @@ button,input,select,textarea{font:inherit}
     height:34px;
   }
 }
+/* ===== 修正商品卡片對齊與標題擠壓問題 ===== */
+
+/* 1. 確保卡片高度一致，並使用 Flex 佈局讓內部元素可以推擠 */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 讓所有卡片在同一列時等高 */
+}
+
+.product-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* 讓 body 佔滿剩餘空間，方便把按鈕推到底部 */
+  padding: 22px;
+}
+
+/* 2. 修正標題行高與對齊，防止長標題撐開高度不一 */
+.product-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* 頂部對齊，防止價格隨標題行數跳動 */
+  gap: 12px;
+  margin-bottom: 10px;
+  min-height: 56px; /* ✅ 關鍵：預留兩行標題的高度，確保下方對齊點一致 */
+}
+
+.product-title {
+  flex: 1;
+  font-size: 20px; /* 稍微調小一點點，增加容錯空間 */
+  line-height: 1.3;
+  /* 限制最多顯示兩行，超過顯示省略號 (可選) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 3. 防止價格換行或被擠壓 */
+.product-title-row .price {
+  white-space: nowrap; /* ✅ 關鍵：防止價格數字斷行 */
+  flex-shrink: 0;      /* ✅ 關鍵：標題再長都不能擠壓到價格寬度 */
+  font-size: 18px;
+  color: var(--primary);
+  text-align: right;
+}
+
+/* 4. 修正描述文字，統一高度 */
+.product-body .muted {
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 限制描述也是兩行，維持整潔 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 44px; /* 預留描述空間 */
+}
+
+/* 5. 終極對齊：將按鈕強行推至底部 */
+.product-actions {
+  margin-top: auto; /* ✅ 關鍵：這行會把按鈕區塊推到卡片的最底部 */
+  padding-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.product-actions .btn {
+  flex: 1; /* 讓兩個按鈕平分寬度，看起來更整齊 */
+  padding: 12px 10px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* 手機版微調 */
+@media (max-width: 480px) {
+  .product-title-row {
+    min-height: auto; /* 手機版通常單欄，不需要硬性預留高度 */
+  }
+  .product-actions {
+    flex-direction: column; /* 手機版按鈕上下堆疊 */
+  }
+}
