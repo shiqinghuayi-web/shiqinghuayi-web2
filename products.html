@@ -4,34 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>拾情畫憶｜商品列表</title>
-  <link rel="icon" href="/client/assets/images/111.png" />
+  <link rel="icon" href="client/assets/images/111.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/css/style.css" />
+  <link rel="stylesheet" href="client/css/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="container header-wrap header-full">
-      <a class="brand logo-brand" href="/index.html">
-  <img src="/client/assets/images/piyan.png" alt="拾情話憶 Logo"; height="40">
-</a>
+      <a class="brand logo-brand" href="index.html">
+        <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo" height="40">
+      </a>
       <nav class="main-nav">
-        <a href="/index.html">首頁</a>
-        <a href="/products.html" class="active">商品</a>
-        <a href="/cart.html">購物車 <span id="cart-count" class="cart-badge">0</span></a>
-        <a href="/login.html">登入</a>
-        <a href="/account.html">會員中心</a>
+        <a href="index.html">首頁</a>
+        <a href="products.html" class="active">商品</a>
+        <a href="cart.html">購物車 <span id="cart-count" class="cart-badge">0</span></a>
+        <a href="login.html">登入</a>
+        <a href="account.html">會員中心</a>
       </nav>
     </div>
   </header>
+
   <main class="section page-top">
     <div class="container">
       <section class="page-hero">
         <span class="eyebrow">Collection</span>
         <h1>風格選物</h1>
-        <p>從茶葉、茶器到品茗日常選物，以非傳統制式列表，打造沉浸式的品茶體驗。</p>
+        <p>從茶葉、茶器到品茗日常選物，打造沉浸式的品茶體驗。</p>
       </section>
+
       <div class="filter-bar">
         <input id="search-input" class="input" type="text" placeholder="搜尋商品名稱..." />
         <select id="category-filter" class="input">
@@ -48,22 +50,24 @@
           <option value="price-desc">價格高到低</option>
         </select>
       </div>
+
       <div id="product-list" class="product-grid"></div>
     </div>
   </main>
+
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-      <a class="brand logo-brand footer-logo" href="/index.html">
-          <img src="/client/assets/images/piyan2.png" alt="拾情話憶 Logo">
-      </a>
+        <a class="brand logo-brand footer-logo" href="index.html">
+          <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+        </a>
       </div>
       <div>
         <h4>網站導覽</h4>
-        <a href="/products.html">商品列表</a>
-        <a href="/cart.html">購物車</a>
-        <a href="/account.html">會員中心</a>
-        <a href="/admin.html">商品管理</a>
+        <a href="products.html">商品列表</a>
+        <a href="cart.html">購物車</a>
+        <a href="account.html">會員中心</a>
+        <a href="admin.html">商品管理</a>
       </div>
       <div>
         <h4>客服資訊</h4>
@@ -73,7 +77,8 @@
       </div>
     </div>
   </footer>
- <script src="./client/js/mockProductsFrontend.js"></script>
- <script src="./client/js/products.js"></script>
+
+  <script src="client/js/mockProductsFrontend.js"></script>
+  <script src="client/js/products.js"></script>
 </body>
 </html>
