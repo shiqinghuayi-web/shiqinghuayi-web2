@@ -1,151 +1,85 @@
-
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
-function getCart() {
-  return JSON.parse(localStorage.getItem('cart') || '[]');
-}
-
-function saveCart(cart) {
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function updateCartCount() {
-  const count = getCart().reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-  document.querySelectorAll('#cart-count').forEach(el => {
-    el.textContent = count;
-  });
-}
-
-function getProductId(product) {
-  return product?.id || product?.productId || product?.slug || Date.now();
-}
-
-function getProductName(product) {
-  return product?.name || product?.title || '未命名商品';
-}
-
-function getProductPrice(product) {
-  return Number(product?.price || product?.unitPrice || 0);
-}
-
-function getProductImage(product) {
-  return product?.imageUrl || product?.image || product?.coverImage || FALLBACK_IMAGE;
-}
-
-function getProductCategory(product) {
-  if (typeof product?.category === 'object' && product.category !== null) {
-    return product.category.name || '商品分類';
-  }
-  return product?.category || '商品分類';
-}
-
-function createCartItem(product, quantity = 1) {
-  return {
-    id: getProductId(product),
-    productId: getProductId(product),
-    slug: product?.slug || '',
-    name: getProductName(product),
-    title: getProductName(product),
-    price: getProductPrice(product),
-    unitPrice: getProductPrice(product),
-    imageUrl: getProductImage(product),
-    image: getProductImage(product),
-    quantity
-  };
-}
-
-function addToCart(product, quantity = 1) {
-  const cart = getCart();
-  const productId = String(getProductId(product));
-  const existing = cart.find(item => String(item.id) === productId);
-
-  if (existing) {
-    existing.quantity += quantity;
-  } else {
-    cart.push(createCartItem(product, quantity));
-  }
-
-  saveCart(cart);
-  updateCartCount();
-}
-
-function money(n) {
-  return `NT$ ${Number(n || 0)}`;
-}
-
-function getSlugFromUrl() {
-  return new URLSearchParams(window.location.search).get('slug');
-}
-
-function changeQty(step) {
-  const input = document.getElementById('qty-input');
-  if (!input) return;
-  const next = Math.max(1, Number(input.value || 1) + step);
-  input.value = next;
-}
-
-function addToCartByData(product) {
-  const quantity = Math.max(1, Number(document.getElementById('qty-input')?.value || 1));
-  addToCart(product, quantity);
-  alert('已加入購物車');
-}
+// 工具函式 (與 main.js 保持同步)
+const getProductImage = (p) => p?.imageUrl || p?.image || FALLBACK_IMAGE;
+const getProductName = (p) => p?.name || '未命名商品';
+const getProductPrice = (p) => Number(p?.price || 0);
+const getProductCategory = (p) => typeof p?.category === 'object' ? p.category.name : (p?.category || '精選茶飲');
+const money = (n) => `NT$ ${Number(n || 0)}`;
 
 async function loadProductDetail() {
-  const slug = getSlugFromUrl();
+  const slug = new URLSearchParams(window.location.search).get('slug');
   const container = document.getElementById('product-detail');
-  if (!container) return;
+  if (!container || !slug) return;
 
-  if (!slug) {
-    container.innerHTML = '<div class="empty-state">找不到商品參數</div>';
-    return;
-  }
+  let product = null;
 
   try {
     const res = await fetch(`/api/products/${slug}`);
-    const result = await res.json();
-    const product = result.data;
-    if (!product) throw new Error('not found');
-
-    container.innerHTML = `
-      <section class="detail-card">
-        <div class="detail-image">
-          <img src="${getProductImage(product)}" alt="${getProductName(product)}">
-        </div>
-        <div class="detail-info">
-          <span class="section-label">${getProductCategory(product)}</span>
-          <h1>${getProductName(product)}</h1>
-          <p class="price">${money(getProductPrice(product))}</p>
-          <p class="muted">${product.description || ''}</p>
-
-          <div class="detail-highlights">
-            <div><span>庫存</span><strong>${Number(product.stock || 0)}</strong></div>
-            <div><span>系列</span><strong>${getProductCategory(product)}</strong></div>
-            <div><span>風格</span><strong>Warm Botanical</strong></div>
-          </div>
-
-          <div class="qty-row">
-            <span>數量</span>
-            <div class="qty-box">
-              <button type="button" onclick="changeQty(-1)">−</button>
-              <input id="qty-input" type="number" min="1" value="1">
-              <button type="button" onclick="changeQty(1)">＋</button>
-            </div>
-          </div>
-
-          <div class="product-actions">
-            <button class="btn" onclick='addToCartByData(${JSON.stringify(product)})'>加入購物車</button>
-            <a class="btn btn-light" href="/cart.html">前往購物車</a>
-          </div>
-          <div class="mini-note">這頁也已經統一成與首頁相同的品牌氛圍與配色語言。</div>
-        </div>
-      </section>
-    `;
-  } catch (error) {
-    container.innerHTML = '<div class="empty-state">商品載入失敗</div>';
+    if (res.ok) {
+      const result = await res.json();
+      product = result.data;
+    }
+  } catch (e) {
+    console.warn("詳情頁 API 載入失敗，搜尋 Mock 資料");
   }
+
+  if (!product && window.mockProducts) {
+    product = window.mockProducts.find(p => p.slug === slug || String(p.id) === slug);
+  }
+
+  if (!product) {
+    container.innerHTML = '<div class="empty-state">找不到該商品資訊</div>';
+    return;
+  }
+
+  container.innerHTML = `
+    <section class="detail-card">
+      <div class="detail-image">
+        <img src="${getProductImage(product)}" alt="${getProductName(product)}">
+      </div>
+      <div class="detail-info">
+        <span class="section-label">${getProductCategory(product)}</span>
+        <h1>${getProductName(product)}</h1>
+        <p class="price">${money(getProductPrice(product))}</p>
+        <p class="muted">${product.description || ''}</p>
+        <div class="detail-highlights">
+          <div><span>庫存</span><strong>${product.stock || 0}</strong></div>
+          <div><span>分類</span><strong>${getProductCategory(product)}</strong></div>
+        </div>
+        <div class="qty-row">
+          <span>數量</span>
+          <div class="qty-box">
+            <button onclick="changeQty(-1)">−</button>
+            <input id="qty-input" type="number" value="1" min="1">
+            <button onclick="changeQty(1)">＋</button>
+          </div>
+        </div>
+        <div class="product-actions">
+          <button class="btn" id="add-to-cart-btn">加入購物車</button>
+          <a class="btn btn-light" href="cart.html">前往購物車</a>
+        </div>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('add-to-cart-btn').onclick = () => {
+    const qty = Number(document.getElementById('qty-input').value);
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existing = cart.find(item => String(item.id) === String(product.id));
+    if (existing) { existing.quantity += qty; }
+    else {
+      cart.push({ id: product.id, name: product.name, price: product.price, imageUrl: getProductImage(product), quantity: qty });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('已加入購物車');
+    location.reload(); // 更新數量顯示
+  };
 }
 
-updateCartCount();
+window.changeQty = (step) => {
+  const input = document.getElementById('qty-input');
+  input.value = Math.max(1, Number(input.value) + step);
+};
+
 loadProductDetail();
-window.changeQty = changeQty;
-window.addToCartByData = addToCartByData;
