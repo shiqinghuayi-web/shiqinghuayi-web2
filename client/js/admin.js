@@ -1,3 +1,15 @@
+(function() {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');
+
+    // 如果沒登入，或是角色不是 admin，就踢回首頁或登入頁
+    if (!token || role !== 'admin') {
+        alert('權限不足，請以管理員帳號登入。');
+        window.location.href = 'index.html'; 
+    }
+})();
+
+// 下面才是原本的 loadAdminProducts 等邏輯...
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
 // --- 基礎工具 ---
