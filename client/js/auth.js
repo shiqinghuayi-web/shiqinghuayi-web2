@@ -1,5 +1,5 @@
 // 1. 確保網址是 https 且結尾沒有多餘斜線
-const API_BASE_URL = 'https://average-turtle-47.loca.lt';
+const API_BASE_URL = 'https://shiqingbackend.loca.lt';
 
 console.log('AUTH JS (Login) 已載入');
 
