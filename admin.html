@@ -43,9 +43,14 @@
             <input class="input" type="text" name="slug" placeholder="商品代稱 slug (例如: honey-red-oolong)" required />
             <input class="input" type="number" name="price" placeholder="價格" required />
             <input class="input" type="number" name="stock" placeholder="庫存" required />
-            <input class="input full" type="text" name="imageUrl" placeholder="圖片路徑 (例如: client/assets/images/product1.jpg)" />
+            
+            <div class="input full" style="display: flex; align-items: center; gap: 15px; border: 1px dashed var(--primary); background: rgba(71, 102, 59, 0.05);">
+              <label style="font-weight: 700; color: var(--primary-strong);">商品照片：</label>
+              <input type="file" name="image" accept="image/*" required />
+            </div>
+
             <textarea class="input textarea full" name="description" placeholder="商品描述"></textarea>
-            <button class="btn full" type="submit">確認新增商品</button>
+            <button class="btn full" type="submit">確認上傳並新增商品</button>
           </form>
         </section>
 
