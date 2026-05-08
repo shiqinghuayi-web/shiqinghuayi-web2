@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://average-turtle-47.loca.lt'; 
+const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
