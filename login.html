@@ -4,54 +4,62 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>拾情畫憶｜登入</title>
-  <link rel="icon" href="/client/assets/images/111.png" />
+  <link rel="icon" href="client/assets/images/111.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/css/style.css" />
+  <link rel="stylesheet" href="client/css/style.css" />
 </head>
 <body>
-   <header class="site-header hero-header">
+  <header class="site-header hero-header">
     <div class="header-wrap header-full">
-      <a class="brand logo-brand" href="/index.html">
-        <img src="/client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+      <a class="brand logo-brand" href="index.html">
+        <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
       </a>
 
       <nav class="main-nav">
-        <a href="/index.html" class="active">首頁</a>
-        <a href="/products.html">商品</a>
-        <a href="/cart.html">購物車 <span id="cart-count" class="cart-badge">0</span></a>
-        <a href="/login.html">登入</a>
-        <a href="/account.html">會員中心</a>
+        <a href="index.html">首頁</a>
+        <a href="products.html">商品</a>
+        <a href="cart.html">購物車 <span id="cart-count" class="cart-badge">0</span></a>
+        <a href="login.html" class="active">登入</a>
+        <a href="account.html">會員中心</a>
       </nav>
     </div>
   </header>
+
   <main class="auth-layout">
     <section class="auth-card">
       <div class="auth-side">
         <span class="eyebrow">Welcome Back</span>
         <h1>登入拾情話憶</h1>
-        <p>延續 REMNORA 式的沉浸感，登入頁也保留品牌氣質，而不是單純一塊表單。</p>
+        <p>延續 REMNORA 式的沉浸感，登入頁也保留品牌氣質，讓每一次回歸都充滿詩意。</p>
         <div class="auth-benefits">
-          <div>查看訂單與配送進度</div>
-          <div>保存購物與會員資訊</div>
-          <div>後續可接 Google / Facebook 登入</div>
+          <div>✦ 查看訂單與配送進度</div>
+          <div>✦ 保存購物與會員資訊</div>
+          <div>✦ 專屬會員優惠通知</div>
         </div>
       </div>
       <div class="auth-panel">
         <form id="login-form" class="auth-form">
           <span class="section-label">Member Login</span>
           <h2 style="margin:0;font-family:var(--font-display);font-size:46px;color:var(--primary-strong)">會員登入</h2>
+          
           <input class="input" type="email" name="email" placeholder="Email" required />
           <input class="input" type="password" name="password" placeholder="密碼" required />
+          
           <button class="btn full" type="submit">登入帳號</button>
-          <button class="btn btn-light full" type="button">Google 登入</button>
-          <button class="btn btn-outline full" type="button">Facebook 登入</button>
-          <p class="form-tip">還沒有帳號？<a href="/register.html">立即註冊</a></p>
+          
+          <div style="text-align:center; margin: 15px 0; color: #aaa; font-size: 12px;">或使用以下方式登入</div>
+          
+          <button class="btn btn-light full" type="button" onclick="alert('第三方登入建置中')">Google 登入</button>
+          <button class="btn btn-outline full" type="button" onclick="alert('第三方登入建置中')">Facebook 登入</button>
+          
+          <p class="form-tip">還沒有帳號？<a href="register.html">立即註冊</a></p>
         </form>
       </div>
     </section>
   </main>
+
   <script src="client/js/auth.js"></script>
 </body>
 </html>
