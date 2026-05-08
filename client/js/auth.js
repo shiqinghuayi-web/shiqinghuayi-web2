@@ -1,7 +1,7 @@
 // 1. 確保網址是 https 且結尾沒有多餘斜線
 const API_BASE_URL = 'https://shiqingbackend.loca.lt';
 
-console.log('AUTH JS (Login) 已載入');
+console.log('AUTH JS (Login) 已載入 - 支援 Admin 跳轉');
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
@@ -33,13 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 這裡加入一個標頭，嘗試繞過 Localtunnel 的隨機警告頁面
                     'Bypass-Tunnel-Reminder': 'true'
                 },
                 body: JSON.stringify(payload)
             });
 
-            // 檢查回應狀態
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
                 throw new Error(errorData.message || `連線失敗 (狀態碼: ${res.status})`);
@@ -49,20 +47,27 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('後端回傳結果:', result);
 
             if (result.success) {
-                // 根據你之前 server.js 的結構是 result.data.token
                 const token = result.data?.token;
-                const user = result.data?.user;
+                const user = result.data?.user; // 包含 name, email, role
 
                 if (!token) throw new Error('伺服器未回傳驗證碼 (Token)');
 
-                // 儲存至本地
+                // --- 核心修改：儲存角色資訊 ---
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('userRole', user.role); // 單獨存一份方便 admin.js 檢查
 
-                alert('登入成功！');
+                alert(`登入成功！歡迎回來，${user.name}`);
 
-                // GitHub Pages 建議使用 ./account.html 確保在子目錄路徑正確
-                window.location.href = './account.html';
+                // --- 核心修改：根據角色自動跳轉 ---
+                if (user.role === 'admin') {
+                    console.log('偵測為管理員，跳轉至後台...');
+                    window.location.href = './admin.html';
+                } else {
+                    console.log('偵測為一般用戶，跳轉至個人中心...');
+                    window.location.href = './account.html';
+                }
+
             } else {
                 throw new Error(result.message || '登入失敗');
             }
@@ -70,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Login Error:', error);
             
-            // 針對 Mixed Content 或 網路斷線的友善提示
             if (error.message.includes('Failed to fetch')) {
                 alert('無法連線到後端伺服器。請檢查：\n1. B電腦的 Localtunnel 是否已開啟\n2. 您是否已手動點擊過 Localtunnel 的 Continue 按鈕');
             } else {
