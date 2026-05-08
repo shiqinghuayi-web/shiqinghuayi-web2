@@ -4,7 +4,7 @@
  */
 
 // 1. 設定後端基本網址 (確保與你 login.js 的 API 網址一致)
-const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
+const API_BASE_URL = 'https://shiqingbackend30678.loca.lt'; 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
 // --- 基礎工具函式 ---
