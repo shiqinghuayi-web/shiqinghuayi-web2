@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
+const API_BASE_URL = 'https://thin-dragonfly-76.loca.lt'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
