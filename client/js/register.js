@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://shiqingbackend.loca.lt30678'; 
+const API_BASE_URL = 'https://shiqingbackend.loca.lt'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
@@ -9,17 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.querySelector('button[type="submit"]');
 
     // --- 建立密碼強度顯示區 (若 HTML 已有則不重複建立) ---
-    let strengthWrapper = document.getElementById('password-strength-wrapper');
-    if (!strengthWrapper) {
-        strengthWrapper = document.createElement('div');
-        strengthWrapper.id = 'password-strength-wrapper';
-        strengthWrapper.style = 'margin-top: 10px; display: none;';
-        strengthWrapper.innerHTML = `
-            <div id="strength-bar" style="height: 6px; width: 0%; transition: 0.4s; border-radius: 3px; background: #eee;"></div>
-            <p id="strength-text" style="font-size: 13px; margin-top: 5px; font-weight: 500;"></p>
-        `;
-        passwordInput.parentNode.appendChild(strengthWrapper);
-    }
+    const strengthWrapper = document.getElementById('strength-container');
     const strengthBar = document.getElementById('strength-bar');
     const strengthText = document.getElementById('strength-text');
 
