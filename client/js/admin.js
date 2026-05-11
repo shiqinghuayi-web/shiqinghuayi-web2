@@ -7,7 +7,7 @@
     }
 })();
 
-const API_BASE_URL = 'https://shiqingbackend.loca.lt'; // 確保你的隧道網址正確
+const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; // 確保你的隧道網址正確
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
 // --- 基礎工具 ---
