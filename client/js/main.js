@@ -15,26 +15,6 @@ function updateCartCount() {
     });
 }
 
-// 核心：全站右上角導覽列登入狀態切換
-function setupAuthNav() {
-    const token = localStorage.getItem('token');
-    const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
-    
-    navAuthBtns.forEach(btn => {
-        if (token) {
-            btn.textContent = '登出';
-            btn.href = '#';
-            btn.onclick = (e) => {
-                e.preventDefault();
-                if (confirm('確定要登出嗎？')) {
-                    localStorage.clear();
-                    window.location.href = './index.html';
-                }
-            };
-        }
-    });
-}
-
 function getProductId(product) { return product?.id || product?.slug || Date.now(); }
 function getProductName(product) { return product?.name || '未命名商品'; }
 function getProductPrice(product) { return Number(product?.price || 0); }
@@ -134,7 +114,6 @@ async function loadFeaturedProducts() {
 
 // --- 初始化 ---
 document.addEventListener('DOMContentLoaded', () => {
-    setupAuthNav(); // 初始化導覽列
     updateCartCount();
     loadFeaturedProducts();
 });
@@ -197,25 +176,35 @@ if (nextBtn && prevBtn) {
 if (slide && imagesList.length > 0) startTimer();
 // --- 跑馬燈邏輯結束 ---
 
-// --- 全域導覽列：登入/登出狀態自動切換 ---
+// --- 全域導覽列：登入/登出與管理員切換 ---
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole'); // 抓取身分
     const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
     
     if (token) {
+        // 1. 把登入改登出
         navAuthBtns.forEach(btn => {
             btn.textContent = '登出';
             btn.href = '#';
             btn.onclick = (e) => {
                 e.preventDefault();
                 if (confirm('確定要登出嗎？')) {
-                    // 清除所有驗證資料，但保留購物車
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     localStorage.removeItem('userRole');
-                    window.location.href = 'index.html'; // 登出後強制回首頁
+                    window.location.href = 'index.html'; 
                 }
             };
         });
+
+        // 2. 如果是管理員，把購物車按鈕改成商品管理
+        if (role === 'admin') {
+            const cartLinks = document.querySelectorAll('a[href="cart.html"], a[href="/cart.html"]');
+            cartLinks.forEach(link => {
+                link.innerHTML = '商品管理'; 
+                link.href = 'admin.html';    
+            });
+        }
     }
 });
