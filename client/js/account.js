@@ -1,5 +1,5 @@
 /**
- * 拾情話憶 - 會員中心核心邏輯 (修正版)
+ * 拾情話憶 - 會員中心核心邏輯
  */
 const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 
@@ -45,36 +45,41 @@ function renderOrders(orders, container) {
     `).join('');
 }
 
-// 修正：登出按鈕邏輯
-function handleLogout() {
-    const logoutBtn = document.getElementById('logout-btn');
+// 核心：全域設定登出按鈕狀態
+function setupAuthNav() {
     const token = getToken();
-    if (!logoutBtn) return;
-
-    if (!token) {
-        logoutBtn.style.display = 'none';
-        return;
-    }
-
-    logoutBtn.onclick = (e) => {
-        e.preventDefault();
-        if (confirm('確定要登出嗎？')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('userRole');
-            window.location.href = './login.html'; // 修正：使用相對路徑
+    const navBtns = document.querySelectorAll('.nav-auth-btn, #logout-btn, #sidebar-logout-btn');
+    
+    navBtns.forEach(btn => {
+        if (token) {
+            btn.textContent = '登出';
+            btn.href = '#';
+            btn.style.display = 'block'; // 確保側邊欄按鈕會顯示
+            btn.onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.clear();
+                    window.location.href = './index.html'; // 登出後一律回首頁
+                }
+            };
+        } else {
+            // 如果沒登入，隱藏專屬登出按鈕
+            if (btn.id === 'logout-btn' || btn.id === 'sidebar-logout-btn') {
+                btn.style.display = 'none';
+            }
         }
-    };
+    });
 }
 
 async function loadMemberProfile() {
+    setupAuthNav(); // 初始化右上角與側邊欄按鈕
+
     const profileContainer = document.getElementById('member-profile');
     const ordersContainer = document.getElementById('order-list');
     const token = getToken();
 
     if (!profileContainer) return;
 
-    // 修正：如果沒 Token，直接跳轉，不要等 API 報錯
     if (!token) {
         alert("請先登入");
         window.location.href = './login.html'; 
@@ -100,10 +105,11 @@ async function loadMemberProfile() {
         const me = await meRes.json().catch(() => ({}));
 
         if (!meRes.ok || !me.success) {
-            // 只有當 Token 真的無效時才清除
             if (meRes.status === 401 || meRes.status === 403) {
-                localStorage.removeItem('token');
+                localStorage.clear();
+                alert("登入已過期，請重新登入");
                 window.location.href = './login.html';
+                return;
             }
             throw new Error(me.message || '無法載入個人資料');
         }
@@ -114,10 +120,8 @@ async function loadMemberProfile() {
 
     } catch (error) {
         console.error('Account Error:', error);
-        // 不要隨便清除 token，除非確定是權限問題
-        setEmptyState(profileContainer, '伺服器連線失敗，請檢查後端狀態。');
+        setEmptyState(profileContainer, '伺服器連線失敗，請檢查後端連線狀態。');
     }
-    handleLogout();
 }
 
 document.addEventListener('DOMContentLoaded', loadMemberProfile);
