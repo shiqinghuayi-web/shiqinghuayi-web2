@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拾情畫憶｜訂單管理</title>
+  <link rel="icon" href="client/assets/images/111.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="client/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand logo-brand" href="index.html">
+        <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo" height="40">
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">前台首頁</a>
+        <a href="admin.html">商品管理</a>
+        <a href="admin-orders.html" class="active">訂單管理</a>
+        <a href="#" id="admin-logout-btn" class="nav-auth-btn">登出</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section page-top">
+    <div class="container">
+      <section class="page-hero">
+        <span class="eyebrow">Order Management</span>
+        <h1>訂單管理系統</h1>
+        <p>查看並管理全站顧客的訂單狀態與出貨進度。</p>
+      </section>
+
+      <div class="admin-layout">
+        <section class="panel-card" style="width: 100%;">
+          <div class="panel-head">
+            <div>
+              <span class="section-label">All Orders</span>
+              <h2>全站訂單列表</h2>
+            </div>
+          </div>
+          <div id="admin-order-list"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <a class="brand logo-brand footer-logo" href="index.html">
+        <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+      </a>
+      <div>
+        <h4>網站導覽</h4>
+        <a href="products.html">商品列表</a>
+        <a href="admin.html">商品管理</a>
+        <a href="admin-orders.html">訂單管理</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="client/js/config.js"></script>
+  <script src="client/js/admin-orders.js"></script>
+</body>
+</html>
