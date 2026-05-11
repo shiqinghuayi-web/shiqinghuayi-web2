@@ -135,3 +135,49 @@ window.deleteProduct = async (id) => {
 };
 
 loadAdminProducts();
+
+// 在 admin.js 最下方新增
+async function loadAllOrders() {
+    const list = document.getElementById('admin-order-list');
+    if (!list) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/admin/orders`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Bypass-Tunnel-Reminder': 'true' }
+        });
+        const result = await res.json();
+        const orders = result.data || [];
+
+        list.innerHTML = orders.map(order => `
+            <div class="panel-card" style="margin-bottom:15px; border-left: 5px solid var(--primary);">
+                <div style="display:flex; justify-content:space-between;">
+                    <strong>訂單 #${order.id} - 顧客: ${order.user_name}</strong>
+                    <select onchange="updateOrderStatus(${order.id}, this.value)" style="padding:5px; border-radius:5px;">
+                        <option value="訂單成立" ${order.order_status === '訂單成立' ? 'selected' : ''}>訂單成立</option>
+                        <option value="備貨中" ${order.order_status === '備貨中' ? 'selected' : ''}>備貨中</option>
+                        <option value="已寄件" ${order.order_status === '已寄件' ? 'selected' : ''}>已寄件</option>
+                        <option value="已送達" ${order.order_status === '已送達' ? 'selected' : ''}>已送達</option>
+                        <option value="已取件" ${order.order_status === '已取件' ? 'selected' : ''}>已取件</option>
+                    </select>
+                </div>
+                <p style="font-size:14px; margin-top:10px;">金額: NT$ ${order.total_amount} | 地址: ${order.receiver_address}</p>
+            </div>
+        `).join('');
+    } catch (e) { console.error("訂單加載失敗", e); }
+}
+
+window.updateOrderStatus = async (orderId, newStatus) => {
+    await fetch(`${API_BASE_URL}/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Bypass-Tunnel-Reminder': 'true'
+        },
+        body: JSON.stringify({ status: newStatus })
+    });
+    alert(`訂單 #${orderId} 狀態已更新為 ${newStatus}`);
+};
+
+// 初始執行
+loadAllOrders();
