@@ -1,7 +1,6 @@
 /**
  * 拾情話憶 - 會員中心核心邏輯
  */
-
 function getToken() { return localStorage.getItem('token'); }
 
 function setEmptyState(container, text) {
@@ -22,29 +21,92 @@ function renderProfile(user, container) {
     container.innerHTML = `
         <div class="profile-item" style="margin-bottom:15px;"><strong>姓名</strong><p>${user.name || '-'}</p></div>
         <div class="profile-item" style="margin-bottom:15px;"><strong>Email</strong><p>${user.email || '-'}</p></div>
-        <div class="profile-item" style="margin-bottom:15px;"><strong>角色</strong><p>${user.role || 'USER'}</p></div>
-        <div class="profile-item" style="margin-bottom:15px;"><strong>建立時間</strong><p>${formatDate(createTime)}</p></div>
+        <div class="profile-item" style="margin-bottom:15px;"><strong>角色</strong><p>${user.role === 'admin' ? '管理員' : '一般會員'}</p></div>
+        <div class="profile-item" style="margin-bottom:15px;"><strong>加入時間</strong><p>${formatDate(createTime)}</p></div>
     `;
 }
 
+// ==========================================
+// 核心：渲染帶有「橫向進度條」與「明細」的訂單
+// ==========================================
 function renderOrders(orders, container) {
     if (!Array.isArray(orders) || !orders.length) {
-        return setEmptyState(container, '目前還沒有訂單資料。');
+        return setEmptyState(container, '目前還沒有訂單資料。趕快去選購喜歡的商品吧！');
     }
-    container.innerHTML = orders.map(order => `
-        <div class="order-card" style="border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center">
-                <strong>訂單 #${order.id ?? '-'}</strong>
-                <span class="status-pill" style="background:#f4b084; color:white; padding:2px 8px; border-radius:4px; font-size:12px;">
-                    ${order.orderStatus || '處理中'}
-                </span>
+
+    // 定義所有可能的訂單狀態順序
+    const statusSteps = ['訂單成立', '備貨中', '已寄件', '已送達', '已取件'];
+
+    container.innerHTML = orders.map(order => {
+        // 1. 解析訂單商品 (將 JSON 轉回陣列)
+        let items = [];
+        try {
+            items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+        } catch(e) { console.error("商品解析失敗", e); }
+
+        const itemsHtml = items.map(item => `
+            <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+                <span>${item.name} <span class="muted">× ${item.quantity}</span></span>
+                <span>${money(item.price * item.quantity)}</span>
             </div>
-            <p class="muted" style="font-size:14px; color:#666; margin:5px 0;">金額：${money(order.totalAmount)}</p>
-        </div>
-    `).join('');
+        `).join('');
+
+        // 2. 計算進度條狀態
+        const currentStatus = order.order_status || order.orderStatus || '訂單成立';
+        const currentIndex = statusSteps.indexOf(currentStatus) !== -1 ? statusSteps.indexOf(currentStatus) : 0;
+        const progressPercentage = (currentIndex / (statusSteps.length - 1)) * 100;
+
+        const progressHtml = `
+            <div style="margin: 30px 0; padding: 0 10px;">
+                <div style="display: flex; justify-content: space-between; position: relative;">
+                    <div style="position: absolute; top: 10px; left: 0; width: 100%; height: 4px; background: #eee; z-index: 1;"></div>
+                    <div style="position: absolute; top: 10px; left: 0; width: ${progressPercentage}%; height: 4px; background: var(--primary-strong); z-index: 1; transition: width 0.5s;"></div>
+                    
+                    ${statusSteps.map((status, index) => {
+                        const isCompleted = index <= currentIndex;
+                        return `
+                        <div style="position: relative; z-index: 2; text-align: center; width: 60px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${isCompleted ? 'var(--primary-strong)' : '#eee'}; margin: 0 auto 8px; border: 3px solid white; box-shadow: 0 0 0 1px ${isCompleted ? 'var(--primary-strong)' : '#ddd'};"></div>
+                            <div style="font-size: 12px; font-weight: ${isCompleted ? 'bold' : 'normal'}; color: ${isCompleted ? 'var(--primary-strong)' : '#999'};">${status}</div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+
+        // 3. 組合訂單卡片
+        let paymentLabel = '';
+        if(order.payment_method === 'credit-card') paymentLabel = '信用卡';
+        else if(order.payment_method === 'atm') paymentLabel = 'ATM 轉帳';
+        else if(order.payment_method === 'cod') paymentLabel = '貨到付款';
+        else paymentLabel = order.payment_method || '未指定';
+
+        return `
+            <div class="order-card" style="border:1px solid #eaeaea; padding:25px; border-radius:12px; margin-bottom:20px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <strong style="font-size: 18px; font-family: var(--font-display);">訂單 #${order.id ?? '-'}</strong>
+                    <span style="color: #888; font-size: 14px;">${formatDate(order.created_at || order.createdAt)}</span>
+                </div>
+
+                ${progressHtml}
+
+                <hr style="border: none; border-top: 1px dashed #eee; margin: 20px 0;">
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #888;">訂購明細</h4>
+                    ${itemsHtml}
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #f5f5f5; padding-top: 15px;">
+                    <span class="muted" style="font-size:14px; color:#666;">付款方式：${paymentLabel}</span>
+                    <strong style="color: var(--primary-strong); font-size: 20px;">總計：${money(order.total_amount || order.totalAmount)}</strong>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-// 設定登出按鈕
 function setupAuthNav() {
     const token = getToken();
     const navBtns = document.querySelectorAll('.nav-auth-btn, #logout-btn, #sidebar-logout-btn');
@@ -58,7 +120,7 @@ function setupAuthNav() {
                 e.preventDefault();
                 if (confirm('確定要登出嗎？')) {
                     localStorage.clear();
-                    window.location.href = './index.html'; 
+                    window.location.href = 'index.html'; 
                 }
             };
         } else {
@@ -80,7 +142,7 @@ async function loadMemberProfile() {
 
     if (!token) {
         alert("請先登入");
-        window.location.href = './login.html'; 
+        window.location.href = 'login.html'; 
         return;
     }
 
@@ -102,18 +164,19 @@ async function loadMemberProfile() {
 
         const me = await meRes.json().catch(() => ({}));
 
-        // 核心防護：發現任何異常，立刻終止並跳轉
         if (!meRes.ok || !me.success) {
             if (meRes.status === 401 || meRes.status === 403 || meRes.status === 404) {
                 localStorage.clear();
                 alert("登入狀態異常，請重新登入");
-                window.location.href = './login.html';
-                return; // 加上 return，腳本就會在這裡停止，不會往下報錯！
+                window.location.href = 'login.html';
+                return;
             }
             throw new Error(me.message || '無法載入個人資料');
         }
 
         renderProfile(me.data, profileContainer);
+        
+        // 渲染真實訂單
         const myOrders = orderRes.ok ? await orderRes.json().catch(() => ({})) : { data: [] };
         renderOrders(myOrders.data || [], ordersContainer);
 
