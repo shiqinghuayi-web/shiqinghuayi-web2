@@ -38,18 +38,19 @@
               <span class="section-label">Delivery Info</span>
               <h1>收件資訊</h1>
             </div>
-          </div>
+        </div>
           <form id="checkout-form" class="form-grid">
             <input class="input" type="text" name="receiverName" placeholder="收件人姓名" required />
             <input class="input" type="text" name="receiverPhone" placeholder="聯絡電話" required />
             <input class="input full" type="text" name="receiverAddress" placeholder="收件地址" required />
+            <input class="input full" type="text" name="receiverEmail" placeholder="電子郵件" required />
             <select class="input full" name="paymentMethod" required>
               <option value="">請選擇付款方式</option>
               <option value="credit-card">信用卡付款</option>
               <option value="atm">ATM 轉帳</option>
               <option value="cod">貨到付款</option>
             </select>
-            <button class="btn full" type="submit">送出訂單</button>
+          
           </form>
         </section>
         <aside class="summary-card">
@@ -57,6 +58,8 @@
           <div id="checkout-items"></div>
           <hr class="divider" />
           <div id="checkout-total"></div>
+          
+          <button class="btn full" type="submit">送出訂單</button>
         </aside>
       </div>
     </div>
