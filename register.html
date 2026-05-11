@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>拾情畫憶｜註冊</title>
-  <link rel="icon" href="/client/assets/images/111.png" />
+  <link rel="icon" href="/assets/images/111.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
   <header class="site-header hero-header">
     <div class="header-wrap header-full">
       <a class="brand logo-brand" href="/index.html">
-        <img src="/client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+        <img src="/assets/images/piyan2.png" alt="拾情話憶 Logo">
       </a>
 
       <nav class="main-nav">
@@ -44,14 +44,14 @@
           <h2 style="margin:0;font-family:var(--font-display);font-size:46px;color:var(--primary-strong)">建立會員</h2>
           <input class="input" type="text" name="name" placeholder="姓名" required />
           <input class="input" type="email" name="email" placeholder="Email" required />
-          <input class="input" type="password" name="password" placeholder="密碼" required />
     <div class="form-group">
-    <input type="password" id="reg-password" placeholder="請輸入密碼 (8位以上)" required>
-    <!-- 強度顯示條 -->
-    <div id="strength-container" style="margin: 8px 0; display: none;">
-        <div id="strength-bar" style="height: 4px; border-radius: 2px; transition: 0.4s; width: 0%;"></div>
-        <small id="strength-text" style="font-size: 12px; margin-top: 4px; display: block;"></small>
-    </div>
+    <input class="input" type="password" name="password" id="reg-password" placeholder="請輸入密碼 (8位以上)" required />
+    <div id="strength-container" style="margin: 12px 0; display: none;">
+    <div style="background: rgba(71, 102, 59, 0.1); border-radius: 4px; height: 6px; width: 100%; overflow: hidden;">
+    <div id="strength-bar" style="height: 100%; width: 0%; transition: 0.4s; border-radius: 2px;"></div>
+  </div>
+  <small id="strength-text" style="font-size: 12px; margin-top: 6px; display: block;"></small>
+</div>
 </div>
           <input class="input" type="password" name="confirmPassword" placeholder="確認密碼" required />
           <div id="password-error" style="color: #d9534f; font-size: 14px; margin-top: -10px; margin-bottom: 10px; display: none;">
@@ -63,6 +63,6 @@
       </div>
     </section>
   </main>
-  <script src="/client/js/register.js"></script>
+  <script src="/js/register.js"></script>
 </body>
 </html>
