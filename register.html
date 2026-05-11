@@ -43,7 +43,13 @@
           <span class="section-label">Create Profile</span>
           <h2 style="margin:0;font-family:var(--font-display);font-size:46px;color:var(--primary-strong)">建立會員</h2>
           <input class="input" type="text" name="name" placeholder="姓名" required />
+          <div id="name-error" style="color: #d9534f; font-size: 14px; margin-top: 4px; display: none;">
+            請輸入正確姓名
+          </div>
           <input class="input" type="email" name="email" placeholder="Email" required />
+          <div id="email-error" style="color: #d9534f; font-size: 14px; margin-top: 4px; display: none;">
+          請輸入有效的電子郵件格式
+          </div>
     <div class="form-group">
     <input class="input" type="password" name="password" id="reg-password" placeholder="請輸入密碼 (8位以上)" required />
     <div id="strength-container" style="margin: 12px 0; display: none;">
