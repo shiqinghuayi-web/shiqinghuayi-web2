@@ -1,5 +1,5 @@
 // 1. 確保網址是 https 且結尾沒有多餘斜線
-const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com';
+
 
 console.log('AUTH JS (Login) 已載入 - 支援 Admin 跳轉');
 
