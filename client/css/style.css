@@ -1410,3 +1410,7 @@ button,input,select,textarea{font:inherit}
   background: #fff;
   transform: scale(1.3);
 }
+#name-error {
+    margin-bottom: 8px; /* 讓它跟下一個輸入框保持距離 */
+    font-weight: 500;
+}
