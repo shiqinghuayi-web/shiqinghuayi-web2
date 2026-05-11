@@ -41,10 +41,10 @@ function setupVideoSound() {
             video.muted = false;
             video.volume = 1.0;
             video.play().catch(() => {});
-            unmuteBtn.textContent = '🔇'; // 切換成靜音符號 (點擊會關聲音)
+            unmuteBtn.textContent = '🔊'; // 切換成靜音符號 (點擊會關聲音)
         } else {
             video.muted = true;
-            unmuteBtn.textContent = '🔊'; // 切換成播放符號 (點擊會開聲音)
+            unmuteBtn.textContent = '🔇'; // 切換成播放符號 (點擊會開聲音)
         }
     };
 }
