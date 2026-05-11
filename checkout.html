@@ -4,24 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>拾情畫憶｜結帳</title>
-  <link rel="icon" href="/client/assets/images/111.png" />
+  <link rel="icon" href="client/assets/images/111.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/client/css/style.css" />
+  <link rel="stylesheet" href="client/css/style.css" />
 </head>
 <body>
   <header class="site-header">
   <div class="container header-wrap header-full">
-  <a class="brand logo-brand" href="/index.html">
-  <img src="/client/assets/images/piyan.png" alt="拾情話憶 Logo">
+  <a class="brand logo-brand" href="index.html">
+  <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo">
   </a>
       <nav class="main-nav">
-        <a href="/index.html">首頁</a>
-        <a href="/products.html">商品</a>
-        <a href="/cart.html" class="active">購物車 <span id="cart-count" class="cart-badge">0</span></a>
-        <a href="/login.html">登入</a>
-        <a href="/account.html">會員中心</a>
+        <a href="index.html">首頁</a>
+        <a href="products.html">商品</a>
+        <a href="cart.html" class="active">購物車 <span id="cart-count" class="cart-badge">0</span></a>
+        <a href="login.html" class="nav-auth-btn">登入</a>
+        <a href="account.html">會員中心</a>
       </nav>
     </div>
   </header>
@@ -50,7 +50,6 @@
               <option value="atm">ATM 轉帳</option>
               <option value="cod">貨到付款</option>
             </select>
-          
           </form>
         </section>
         <aside class="summary-card">
@@ -59,7 +58,7 @@
           <hr class="divider" />
           <div id="checkout-total"></div>
           
-          <button class="btn full" type="submit">送出訂單</button>
+          <button class="btn full" type="submit" form="checkout-form">送出訂單</button>
         </aside>
       </div>
     </div>
@@ -67,16 +66,16 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-         <a class="brand logo-brand footer-logo" href="/index.html">
-          <img src="/client/assets/images/piyan2.png" alt="拾情話憶 Logo">
+         <a class="brand logo-brand footer-logo" href="index.html">
+          <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
         </a>
       </div>
       <div>
         <h4>網站導覽</h4>
-        <a href="/products.html">商品列表</a>
-        <a href="/cart.html">購物車</a>
-        <a href="/account.html">會員中心</a>
-        <a href="/admin.html">商品管理</a>
+        <a href="products.html">商品列表</a>
+        <a href="cart.html">購物車</a>
+        <a href="account.html">會員中心</a>
+        <a href="admin.html">商品管理</a>
       </div>
       <div>
         <h4>客服資訊</h4>
@@ -88,6 +87,6 @@
   </footer>
 
   <script src="client/js/config.js"></script>
-  <script src="/client/js/checkout.js"></script>
+  <script src="client/js/checkout.js"></script>
 </body>
 </html>
