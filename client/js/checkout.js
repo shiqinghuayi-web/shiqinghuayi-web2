@@ -1,92 +1,132 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>拾情畫憶｜結帳</title>
-  <link rel="icon" href="client/assets/images/111.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="client/css/style.css" />
-</head>
-<body>
-  <header class="site-header">
-  <div class="container header-wrap header-full">
-  <a class="brand logo-brand" href="index.html">
-  <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo">
-  </a>
-      <nav class="main-nav">
-        <a href="index.html">首頁</a>
-        <a href="products.html">商品</a>
-        <a href="cart.html" class="active">購物車 <span id="cart-count" class="cart-badge">0</span></a>
-        <a href="login.html" class="nav-auth-btn">登入</a>
-        <a href="account.html">會員中心</a>
-      </nav>
-    </div>
-  </header>
-  <main class="section page-top">
-    <div class="container">
-      <section class="page-hero">
-        <span class="eyebrow">Checkout</span>
-        <h1>完成訂單</h1>
-      </section>
-      <div class="checkout-layout">
-        <section class="panel-card">
-          <div class="panel-head">
-            <div>
-              <span class="section-label">Delivery Info</span>
-              <h1>收件資訊</h1>
-            </div>
-        </div>
-          <form id="checkout-form" class="form-grid">
-            <input class="input" type="text" name="receiverName" placeholder="收件人姓名" required />
-            <input class="input" type="text" name="receiverPhone" placeholder="聯絡電話" required />
-            <input class="input full" type="text" name="receiverAddress" placeholder="收件地址" required />
-            <input class="input full" type="text" name="receiverEmail" placeholder="電子郵件" required />
-            <select class="input full" name="paymentMethod" required>
-              <option value="">請選擇付款方式</option>
-              <option value="credit-card">信用卡付款</option>
-              <option value="atm">ATM 轉帳</option>
-              <option value="cod">貨到付款</option>
-            </select>
-          </form>
-        </section>
-        <aside class="summary-card">
-          <h3 style="margin-top:0">訂單摘要</h3>
-          <div id="checkout-items"></div>
-          <hr class="divider" />
-          <div id="checkout-total"></div>
-          
-          <button class="btn full" type="submit" form="checkout-form">送出訂單</button>
-        </aside>
-      </div>
-    </div>
-  </main>
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-         <a class="brand logo-brand footer-logo" href="index.html">
-          <img src="client/assets/images/piyan2.png" alt="拾情話憶 Logo">
-        </a>
-      </div>
-      <div>
-        <h4>網站導覽</h4>
-        <a href="products.html">商品列表</a>
-        <a href="cart.html">購物車</a>
-        <a href="account.html">會員中心</a>
-        <a href="admin.html">商品管理</a>
-      </div>
-      <div>
-        <h4>客服資訊</h4>
-        <p>服務時間：週一至週五 10:00 - 18:00</p>
-        <p>Email：service@shiqinghuayi.com</p>
-        <p>Tel：02-1234-5678</p>
-      </div>
-    </div>
-  </footer>
+function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
+function saveCart(cart) { localStorage.setItem('cart', JSON.stringify(cart)); }
 
-  <script src="client/js/config.js"></script>
-  <script src="client/js/checkout.js"></script>
-</body>
-</html>
+function updateCartCount() {
+  const count = getCart().reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  document.querySelectorAll('#cart-count').forEach(el => { el.textContent = count; });
+}
+
+function getProductPrice(product) { return Number(product?.price || product?.unitPrice || 0); }
+function getItemName(item) { return item?.name || item?.title || '未命名商品'; }
+function getItemPrice(item) { return Number(item?.price || item?.unitPrice || 0); }
+function money(n) { return `NT$ ${Number(n || 0)}`; }
+
+function renderCheckout() {
+  const cart = getCart();
+  const itemsContainer = document.getElementById('checkout-items');
+  const totalContainer = document.getElementById('checkout-total');
+  if (!itemsContainer || !totalContainer) return;
+
+  if (!cart.length) {
+    itemsContainer.innerHTML = '<div class="empty-state">購物車沒有商品，無法進行結帳。</div>';
+    totalContainer.innerHTML = '<a class="btn full" href="products.html">前往商品頁</a>';
+    return;
+  }
+
+  itemsContainer.innerHTML = cart.map(item => `
+    <div class="summary-line" style="margin-bottom:10px">
+      <span>${getItemName(item)} × ${Number(item.quantity || 1)}</span>
+      <span>${money(getItemPrice(item) * Number(item.quantity || 1))}</span>
+    </div>
+  `).join('');
+
+  const subtotal = cart.reduce((sum,item) => sum + getItemPrice(item) * Number(item.quantity || 1), 0);
+  const shipping = subtotal >= 1500 ? 0 : 80;
+  const total = subtotal + shipping;
+
+  totalContainer.innerHTML = `
+    <div class="summary-line"><span>小計</span><span>${money(subtotal)}</span></div>
+    <div class="summary-line"><span>運費</span><span>${shipping === 0 ? '免運' : money(shipping)}</span></div>
+    <hr class="divider">
+    <div class="summary-total"><span>總計</span><span>${money(total)}</span></div>
+  `;
+}
+
+document.getElementById('checkout-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const cart = getCart();
+  if (!cart.length) return alert('購物車是空的');
+
+  const formData = new FormData(e.currentTarget);
+  const payload = {
+    receiverName: formData.get('receiverName'),
+    receiverPhone: formData.get('receiverPhone'),
+    receiverAddress: formData.get('receiverAddress'),
+    paymentMethod: formData.get('paymentMethod'),
+    items: cart,
+    totalAmount: cart.reduce((sum,item) => sum + getItemPrice(item) * Number(item.quantity || 1), 0)
+  };
+
+  try {
+    const token = localStorage.getItem('token');
+    if(!token) {
+        alert('請先登入會員再結帳');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/orders`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Bypass-Tunnel-Reminder': 'true'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.message || '訂單建立失敗');
+    
+    localStorage.removeItem('cart');
+    alert('🎉 訂單已成功送出！');
+    window.location.href = 'account.html';
+  } catch (error) {
+    alert(error.message || '目前無法送出訂單');
+  }
+});
+
+// --- 全域導覽列：登入/登出與管理員專屬選單 ---
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole'); 
+    const navContainer = document.querySelector('.main-nav');
+    
+    // 1. 如果是「管理員 (Admin)」，直接暴力替換整個導覽列！
+    if (token && role === 'admin') {
+        if (navContainer) {
+            navContainer.innerHTML = `
+                <a href="index.html">前台首頁</a>
+                <a href="products.html">商品頁</a>
+                <a href="admin.html">商品管理</a>
+                <a href="#" id="admin-logout-btn">登出</a>
+            `;
+
+            document.getElementById('admin-logout-btn').onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.clear();
+                    window.location.href = 'index.html'; 
+                }
+            };
+        }
+    } 
+    // 2. 如果是「一般會員」，保留原本的導覽列，只把「登入」變「登出」
+    else if (token) {
+        const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
+        navAuthBtns.forEach(btn => {
+            btn.textContent = '登出';
+            btn.href = '#';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.clear();
+                    window.location.href = 'index.html'; 
+                }
+            };
+        });
+    }
+});
+
+renderCheckout();
+updateCartCount();
