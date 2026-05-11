@@ -3,7 +3,7 @@
 ========================= */
 
 // 1. 確保與後端網址同步
-const API_BASE_URL = 'https://shiqingbackend30678.loca.lt'; 
+const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
 // --- 基礎工具 ---
