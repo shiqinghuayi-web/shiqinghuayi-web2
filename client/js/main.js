@@ -131,3 +131,89 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     loadFeaturedProducts();
 });
+
+// --- 跑馬燈邏輯開始 ---
+let counter = 0;
+const size = 100; 
+const slide = document.querySelector('.carousel-slide');
+const imagesList = document.querySelectorAll('.carousel-slide img');
+const prevBtn = document.querySelector('.prev-btn');
+const nextBtn = document.querySelector('.next-btn');
+
+// 重置自動播放的計時器
+let autoPlay;
+function startTimer() {
+  stopTimer();
+  autoPlay = setInterval(moveNext, 3000); // 建議 3 秒換一張，閱讀比較舒服
+}
+function stopTimer() {
+  clearInterval(autoPlay);
+}
+
+// 在 main.js 的 updateSlide 內增加
+// 在你的 moveNext() 或 updateSlide() 函式中加入點點更新
+function updateSlide() {
+  slide.style.transform = `translateX(${-100 * counter}%)`;
+  
+  // 修復點點：先移除所有 active，再加給當前那一個
+  const allDots = document.querySelectorAll('.dot');
+  allDots.forEach((dot, index) => {
+    if (index === counter) {
+      dot.classList.add('active');
+    } else {
+      dot.classList.remove('active');
+    }
+  });
+}
+
+// 記得在頁面初始化時，也要手動產生 12 個點點（如果你不想在 HTML 硬寫 12 個）
+const dotsContainer = document.querySelector('.dots-container');
+if (dotsContainer) {
+  for (let i = 0; i < 12; i++) {
+    const dot = document.createElement('span');
+    dot.classList.add('dot');
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => {
+      counter = i;
+      updateSlide();
+      stopTimer(); // 點擊後暫停自動播放
+      startTimer();
+    });
+    dotsContainer.appendChild(dot);
+  }
+}
+
+function moveNext() {
+  counter = (counter >= imagesList.length - 1) ? 0 : counter + 1;
+  updateSlide();
+}
+
+function movePrev() {
+  counter = (counter <= 0) ? imagesList.length - 1 : counter - 1;
+  updateSlide();
+}
+
+// 綁定按鈕事件
+if (nextBtn && prevBtn) {
+  nextBtn.addEventListener('click', () => {
+    stopTimer();
+    moveNext();
+    startTimer(); // 點擊後重新計時
+  });
+
+  prevBtn.addEventListener('click', () => {
+    stopTimer();
+    movePrev();
+    startTimer();
+  });
+}
+
+// 初始化
+if (slide && imagesList.length > 0) {
+  startTimer();
+}
+// --- 跑馬燈邏輯結束 ---
+
+updateCartCount();
+loadFeaturedProducts();
+window.quickAddToCart = quickAddToCart;
