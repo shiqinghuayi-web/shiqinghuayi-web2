@@ -1,7 +1,6 @@
 /**
- * 拾情話憶 - main.js (後端 API 串接版)
+ * 拾情話憶 - main.js (終極優化版)
  */
-
 
 // --- 基礎工具函式 ---
 function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
@@ -28,7 +27,29 @@ function getProductImage(product) {
 function getProductCategory(product) { 
     return typeof product?.category === 'object' ? product.category.name : (product?.category || '精選茶飲'); 
 }
-function money(n) { return `NT$ ${Number(n || 0)}`; }
+function money(n) { return `NT$ ${Number(n || 0).toLocaleString()}`; }
+
+// --- 影片聲音控制與 Edge 相容性 ---
+function setupVideoSound() {
+    const video = document.getElementById('hero-video');
+    const unmuteBtn = document.getElementById('unmute-btn');
+    if (!video || !unmuteBtn) return;
+
+    unmuteBtn.onclick = () => {
+        if (video.muted) {
+            video.muted = false;
+            unmuteBtn.innerHTML = '🔇 關閉聲音';
+        } else {
+            video.muted = true;
+            unmuteBtn.innerHTML = '🔊 播放聲音';
+        }
+    };
+
+    // 針對 Edge/Chrome 靜音播放政策的備援：使用者點擊頁面任何處時嘗試播放
+    document.addEventListener('click', () => {
+        if (video.paused) video.play();
+    }, { once: true });
+}
 
 // --- 畫面渲染邏輯 ---
 function createProductCard(product) {
@@ -90,8 +111,12 @@ async function loadFeaturedProducts() {
     if (!container) return;
 
     try {
+        // 加入 headers 防止 Edge 因為安全性阻擋請求
         const res = await fetch(`${API_BASE_URL}/api/products`, {
-            headers: { 'Bypass-Tunnel-Reminder': 'true' }
+            headers: { 
+                'Bypass-Tunnel-Reminder': 'true',
+                'Accept': 'application/json'
+            }
         });
         
         if (!res.ok) throw new Error('API 無法連線');
@@ -103,7 +128,7 @@ async function loadFeaturedProducts() {
             featuredProducts = window.mockProducts || [];
         }
     } catch (error) {
-        console.warn("後端載入失敗，正在切換至 Mock 資料...", error);
+        console.warn("Edge 偵測到連線異常或後端未啟動，切換至備援資料", error);
         featuredProducts = window.mockProducts || [];
     }
 
@@ -111,88 +136,23 @@ async function loadFeaturedProducts() {
                           '<div class="empty-state">目前沒有商品可顯示</div>';
 }
 
-// --- 初始化 ---
-document.addEventListener('DOMContentLoaded', () => {
-    updateCartCount();
-    loadFeaturedProducts();
-});
-
-// --- 跑馬燈邏輯開始 ---
-let counter = 0;
-const size = 100; 
-const slide = document.querySelector('.carousel-slide');
-const imagesList = document.querySelectorAll('.carousel-slide img');
-const prevBtn = document.querySelector('.prev-btn');
-const nextBtn = document.querySelector('.next-btn');
-
-let autoPlay;
-function startTimer() {
-  stopTimer();
-  autoPlay = setInterval(moveNext, 3000); 
-}
-function stopTimer() { clearInterval(autoPlay); }
-
-function updateSlide() {
-  slide.style.transform = `translateX(${-100 * counter}%)`;
-  const allDots = document.querySelectorAll('.dot');
-  allDots.forEach((dot, index) => {
-    if (index === counter) dot.classList.add('active');
-    else dot.classList.remove('active');
-  });
-}
-
-const dotsContainer = document.querySelector('.dots-container');
-if (dotsContainer) {
-  for (let i = 0; i < 12; i++) {
-    const dot = document.createElement('span');
-    dot.classList.add('dot');
-    if (i === 0) dot.classList.add('active');
-    dot.addEventListener('click', () => {
-      counter = i;
-      updateSlide();
-      stopTimer(); 
-      startTimer();
-    });
-    dotsContainer.appendChild(dot);
-  }
-}
-
-function moveNext() {
-  counter = (counter >= imagesList.length - 1) ? 0 : counter + 1;
-  updateSlide();
-}
-
-function movePrev() {
-  counter = (counter <= 0) ? imagesList.length - 1 : counter - 1;
-  updateSlide();
-}
-
-if (nextBtn && prevBtn) {
-  nextBtn.addEventListener('click', () => { stopTimer(); moveNext(); startTimer(); });
-  prevBtn.addEventListener('click', () => { stopTimer(); movePrev(); startTimer(); });
-}
-
-if (slide && imagesList.length > 0) startTimer();
-// --- 跑馬燈邏輯結束 ---
-
 // --- 全域導覽列：登入/登出與管理員專屬選單 ---
-document.addEventListener('DOMContentLoaded', () => {
+function setupAuthNav() {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole'); 
     const navContainer = document.querySelector('.main-nav');
     
-    // 1. 如果是「管理員 (Admin)」，直接暴力替換整個導覽列！
     if (token && role === 'admin') {
         if (navContainer) {
             const path = window.location.pathname;
             const isIndex = path.includes('index.html') || path.endsWith('/');
-            const isProducts = path.includes('products.html');
             const isAdmin = path.includes('admin.html');
+            const isOrders = path.includes('admin-orders.html');
 
             navContainer.innerHTML = `
                 <a href="index.html" class="${isIndex ? 'active' : ''}">前台首頁</a>
-                <a href="products.html" class="${isProducts ? 'active' : ''}">商品頁</a>
                 <a href="admin.html" class="${isAdmin ? 'active' : ''}">商品管理</a>
+                <a href="admin-orders.html" class="${isOrders ? 'active' : ''}">訂單管理</a>
                 <a href="#" id="admin-logout-btn">登出</a>
             `;
 
@@ -204,9 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
         }
-    } 
-    // 2. 如果是「一般會員」，保留原本的導覽列，只把「登入」變「登出」
-    else if (token) {
+    } else if (token) {
         const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
         navAuthBtns.forEach(btn => {
             btn.textContent = '登出';
@@ -220,4 +178,44 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
     }
+}
+
+// --- 跑馬燈邏輯 ---
+let counter = 0;
+function setupCarousel() {
+    const slide = document.querySelector('.carousel-slide');
+    const imagesList = document.querySelectorAll('.carousel-slide img');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const dotsContainer = document.querySelector('.dots-container');
+
+    if (!slide || imagesList.length === 0) return;
+
+    // 產生點點
+    imagesList.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.onclick = () => { counter = i; updateSlide(); };
+        dotsContainer.appendChild(dot);
+    });
+
+    function updateSlide() {
+        slide.style.transform = `translateX(${-100 * counter}%)`;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === counter));
+    }
+
+    nextBtn.onclick = () => { counter = (counter + 1) % imagesList.length; updateSlide(); };
+    prevBtn.onclick = () => { counter = (counter - 1 + imagesList.length) % imagesList.length; updateSlide(); };
+    
+    setInterval(() => { counter = (counter + 1) % imagesList.length; updateSlide(); }, 4000);
+}
+
+// --- 初始化 ---
+document.addEventListener('DOMContentLoaded', () => {
+    setupAuthNav();
+    updateCartCount();
+    loadFeaturedProducts();
+    setupVideoSound();
+    setupCarousel();
 });
