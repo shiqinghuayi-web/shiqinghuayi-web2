@@ -1,7 +1,13 @@
+// 請確保 config.js 在此檔案之前載入，或者手動定義 API_BASE_URL
+const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
-// 工具函式 (與 main.js 保持同步)
-const getProductImage = (p) => p?.imageUrl || p?.image || FALLBACK_IMAGE;
+// 工具函式：支援後端上傳路徑
+const getProductImage = (p) => {
+    let img = p?.image_url || p?.imageUrl || p?.image;
+    if (!img) return FALLBACK_IMAGE;
+    return img.includes('uploads/') ? `${API_BASE_URL}/${img}` : img;
+};
 const getProductName = (p) => p?.name || '未命名商品';
 const getProductPrice = (p) => Number(p?.price || 0);
 const getProductCategory = (p) => typeof p?.category === 'object' ? p.category.name : (p?.category || '精選茶飲');
@@ -15,7 +21,10 @@ async function loadProductDetail() {
   let product = null;
 
   try {
-    const res = await fetch(`/api/products/${slug}`);
+    // 修正：必須補上 API_BASE_URL
+    const res = await fetch(`${API_BASE_URL}/api/products/${slug}`, {
+        headers: { 'Bypass-Tunnel-Reminder': 'true' }
+    });
     if (res.ok) {
       const result = await res.json();
       product = result.data;
@@ -24,6 +33,7 @@ async function loadProductDetail() {
     console.warn("詳情頁 API 載入失敗，搜尋 Mock 資料");
   }
 
+  // 備援方案：找不到 API 資料才用 Mock
   if (!product && window.mockProducts) {
     product = window.mockProducts.find(p => p.slug === slug || String(p.id) === slug);
   }
@@ -66,14 +76,24 @@ async function loadProductDetail() {
   document.getElementById('add-to-cart-btn').onclick = () => {
     const qty = Number(document.getElementById('qty-input').value);
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find(item => String(item.id) === String(product.id));
-    if (existing) { existing.quantity += qty; }
-    else {
-      cart.push({ id: product.id, name: product.name, price: product.price, imageUrl: getProductImage(product), quantity: qty });
+    const productId = product.id || product.slug;
+    
+    const existing = cart.find(item => String(item.id) === String(productId));
+    if (existing) { 
+        existing.quantity += qty; 
+    } else {
+        cart.push({ 
+            id: productId, 
+            name: getProductName(product), 
+            price: getProductPrice(product), 
+            imageUrl: getProductImage(product), 
+            quantity: qty 
+        });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('已加入購物車');
-    location.reload(); // 更新數量顯示
+    alert('已成功加入購物車！');
+    // 不要 location.reload()，會導致跳回頂端，使用者體驗不好
+    if(window.updateCartCount) window.updateCartCount(); 
   };
 }
 
