@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmInput = document.querySelector('input[name="confirmPassword"]');
     const errorMsg = document.getElementById('password-error');
     const submitBtn = document.querySelector('button[type="submit"]');
-
+    const nameErrorMsg = document.getElementById('name-error');
+    const emailInput = document.querySelector('input[name="email"]');
+    const emailErrorMsg = document.getElementById('email-error');
     // --- 建立密碼強度顯示區 (若 HTML 已有則不重複建立) ---
     const strengthWrapper = document.getElementById('strength-container');
     const strengthBar = document.getElementById('strength-bar');
@@ -16,13 +18,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 核心驗證邏輯 ---
     function validateAll() {
         const nameVal = nameInput.value.trim();
+        const emailVal = emailInput.value.trim();
         const p1 = passwordInput.value;
         const p2 = confirmInput.value;
 
+        // Email 正則表達式
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailRegex.test(emailVal);
+
+    if (emailVal.length > 0) {
+        if (!isEmailValid) {
+            // 格式錯誤：變紅框 + 顯示文字
+            emailInput.style.borderColor = '#d9534f';
+            emailErrorMsg.style.display = 'block';
+        } else {
+            // 格式正確：恢復原狀 + 隱藏文字
+            emailInput.style.borderColor = '';
+            emailErrorMsg.style.display = 'none';
+        }
+    } else {
+        // 空值時隱藏
+        emailInput.style.borderColor = '';
+        emailErrorMsg.style.display = 'none';
+    }
+
         // 1. 姓名驗證：僅限中文 (\u4e00-\u9fa5) 或 英文 (A-Za-z)
+    
+        // 姓名驗證邏輯
         const nameRegex = /^[A-Za-z\u4e00-\u9fa5\s]+$/;
         const isNameValid = nameRegex.test(nameVal);
-        nameInput.style.borderColor = (nameVal.length > 0 && !isNameValid) ? '#d9534f' : '';
+
+        if (nameVal.length > 0) {
+            if (!isNameValid) {
+                // 格式錯誤：變紅框 + 顯示文字
+             nameInput.style.borderColor = '#d9534f';
+             nameErrorMsg.style.display = 'block';
+            } else {
+            // 格式正確：恢復原狀 + 隱藏文字
+            nameInput.style.borderColor = '';
+            nameErrorMsg.style.display = 'none';
+            }
+        } else {
+             // 空值時隱藏
+            nameInput.style.borderColor = '';
+            nameErrorMsg.style.display = 'none';
+            }
 
         // 2. 密碼強度判定
         let score = 0;
@@ -67,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 監聽所有輸入欄位
-    [nameInput, passwordInput, confirmInput].forEach(input => {
+    [nameInput, emailInput, passwordInput, confirmInput].forEach(input => {
         input.addEventListener('input', validateAll);
     });
 
