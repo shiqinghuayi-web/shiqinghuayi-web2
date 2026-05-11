@@ -642,6 +642,10 @@ button,input,select,textarea{font:inherit}
 .checkout-layout{
   grid-template-columns:1.28fr .82fr;
   align-items:start;
+  display: grid;
+  grid-template-columns: 1.28fr .82fr; /* 維持你原本的比例 */
+  gap: 24px;
+  align-items: stretch; /* 關鍵：讓左右子元素等高 */
 }
 
 .form-grid{
@@ -1261,23 +1265,59 @@ button,input,select,textarea{font:inherit}
     height:34px;
   }
 }
-.checkout-layout #checkout-form select.input.full {
-  width: 203%;
-  margin-bottom: 20px;
-  display: block;
+/* ===== 結帳頁面佈局優化 (直接覆蓋原有的相關設定) ===== */
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1.28fr 0.82fr;
+  gap: 24px;
+  align-items: stretch; /* 關鍵：確保左右方框等高 */
+  margin-bottom: 40px;
 }
 
-/* 2. 讓右側摘要區內的「送出訂單」按鈕樣式符合你的設計 */
+/* 左側收件資訊方框內部的 select 修正 */
+.checkout-layout #checkout-form select.input.full {
+  width: 100%;
+  margin-bottom: 20px;
+  display: block;
+  appearance: none; /* 移除原生樣式以符合設計 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2347663b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 18px;
+}
+
+/* 右側訂單摘要方框優化 */
+.summary-card {
+  padding: 26px;
+  display: flex;
+  flex-direction: column; /* 讓內部元素垂直排列 */
+  height: 100%;           /* 填滿父層高度 */
+  position: sticky;
+  top: 106px;
+}
+
+/* 讓總計下方的容器撐開，推動按鈕向下 */
+#checkout-total {
+  flex-grow: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* 送出訂單按鈕 - 固定於右側方框底部 */
 .checkout-layout .summary-card .btn.full {
-  margin-top: 24px;
-  background-color: var(--primary); /* 使用你定義的森林綠 */
-  color: #white;
+  margin-top: auto; /* 自動將按鈕推至容器底部 */
+  background-color: var(--primary);
+  color: white;
   padding: 16px;
   border-radius: 999px;
   font-size: 18px;
   width: 100%;
-  display: flex;
+  border: none;
+  cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(71,102,59,0.2);
 }
 
 .checkout-layout .summary-card .btn.full:hover {
@@ -1286,10 +1326,87 @@ button,input,select,textarea{font:inherit}
   box-shadow: var(--shadow);
 }
 
-/* 3. 確保在手機版時，按鈕依然有足夠間距 */
+/* ===== 響應式修正 (平板與手機) ===== */
 @media (max-width: 1024px) {
-  .checkout-layout .summary-card .btn.full {
-    position: static;
-    margin-top: 20px;
+  .checkout-layout {
+    grid-template-columns: 1fr; /* 手機版改為單欄排列 */
+    align-items: flex-start;
   }
+  
+  .summary-card {
+    position: static;
+    height: auto;
+    min-height: auto;
+  }
+
+  .checkout-layout .summary-card .btn.full {
+    margin-top: 24px; /* 手機版不置底，維持固定間距 */
+  }
+}
+
+/* 讓容器維持比例，並隱藏溢出 */
+.carousel-container {
+  position: relative;
+  width: 100%; /* 改為 100% 才能滿版 */
+  max-width: 1000px; /* 或者你希望的最大寬度 */
+  margin: 30px auto;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.carousel-slide {
+  display: flex;
+  width: 100%;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* 絲滑的切換感 */
+}
+
+.carousel-slide img {
+  width: 100%;
+  flex-shrink: 0;
+  aspect-ratio: 3 / 2; /* 根據你的照片比例調整，例如 16/9 或 3/2 */
+  object-fit: cover;   /* 關鍵：確保圖片填滿但不拉伸 */
+}
+
+/* 修正按鈕位置與層級 */
+.prev-btn, .next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; /* 確保在圖片上方 */
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.next-btn { right: 15px; }
+.prev-btn { left: 15px; }
+
+/* 修正點點樣式 */
+.dots-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.dot.active {
+  background: #fff;
+  transform: scale(1.3);
 }
