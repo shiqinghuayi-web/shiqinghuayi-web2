@@ -12,12 +12,13 @@
   <header class="site-header">
     <div class="container header-wrap">
       <a class="brand logo-brand" href="index.html">
-        <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo">
+        <img src="client/assets/images/piyan.png" alt="拾情話憶 Logo" height="40">
       </a>
       <nav class="main-nav">
         <a href="index.html">前台首頁</a>
         <a href="products.html">商品頁</a>
         <a href="admin.html" class="active">商品管理</a>
+        <a href="login.html" class="nav-auth-btn">登入</a>
       </nav>
     </div>
   </header>
@@ -41,6 +42,16 @@
           <form id="admin-product-form" class="form-grid">
             <input class="input" type="text" name="name" placeholder="商品名稱" required />
             <input class="input" type="text" name="slug" placeholder="商品代稱 slug (例如: honey-red-oolong)" required />
+            
+            <select name="category" class="input" required>
+              <option value="" disabled selected>請選擇茶葉分類</option>
+              <option value="綠茶">綠茶</option>
+              <option value="紅茶">紅茶</option>
+              <option value="烏龍">烏龍</option>
+              <option value="金萱">金萱</option>
+              <option value="包種茶">包種茶</option>
+            </select>
+
             <input class="input" type="number" name="price" placeholder="價格" required />
             <input class="input" type="number" name="stock" placeholder="庫存" required />
             
