@@ -1,6 +1,17 @@
 /**
  * 拾情話憶 - 會員中心核心邏輯
  */
+
+// 標籤切換邏輯
+window.switchTab = function(event, tabName) {
+    if (event) event.preventDefault();
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById(`tab-${tabName}`).style.display = 'block';
+
+    document.querySelectorAll('.account-link').forEach(link => link.classList.remove('active'));
+    if(event) event.currentTarget.classList.add('active');
+};
+
 function getToken() { return localStorage.getItem('token'); }
 
 function setEmptyState(container, text) {
@@ -34,11 +45,9 @@ function renderOrders(orders, container) {
         return setEmptyState(container, '目前還沒有訂單資料。趕快去選購喜歡的商品吧！');
     }
 
-    // 定義所有可能的訂單狀態順序
     const statusSteps = ['訂單成立', '備貨中', '已寄件', '已送達', '已取件'];
 
     container.innerHTML = orders.map(order => {
-        // 1. 解析訂單商品 (將 JSON 轉回陣列)
         let items = [];
         try {
             items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
@@ -51,7 +60,6 @@ function renderOrders(orders, container) {
             </div>
         `).join('');
 
-        // 2. 計算進度條狀態
         const currentStatus = order.order_status || order.orderStatus || '訂單成立';
         const currentIndex = statusSteps.indexOf(currentStatus) !== -1 ? statusSteps.indexOf(currentStatus) : 0;
         const progressPercentage = (currentIndex / (statusSteps.length - 1)) * 100;
@@ -75,7 +83,6 @@ function renderOrders(orders, container) {
             </div>
         `;
 
-        // 3. 組合訂單卡片
         let paymentLabel = '';
         if(order.payment_method === 'credit-card') paymentLabel = '信用卡';
         else if(order.payment_method === 'atm') paymentLabel = 'ATM 轉帳';
