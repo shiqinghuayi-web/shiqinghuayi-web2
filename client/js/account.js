@@ -1,14 +1,9 @@
 /**
- * 拾情話憶 - 會員中心核心邏輯
+ * 拾情話憶 - 會員中心核心邏輯 (修正版)
  */
-
-// 1. 基礎配置：請確保此 IP 與 B 電腦主機 IP 一致
 const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 
-// --- 工具函式 ---
-function getToken() {
-    return localStorage.getItem('token');
-}
+function getToken() { return localStorage.getItem('token'); }
 
 function setEmptyState(container, text) {
     if (container) container.innerHTML = `<div class="empty-state" style="padding:20px; color:#888; text-align:center;">${text}</div>`;
@@ -20,18 +15,11 @@ function formatDate(value) {
     return Number.isNaN(d.getTime()) ? '-' : d.toLocaleString();
 }
 
-function money(v) {
-    return `NT$ ${Number(v || 0).toLocaleString()}`;
-}
+function money(v) { return `NT$ ${Number(v || 0).toLocaleString()}`; }
 
-// --- 渲染函式 ---
-
-// 渲染個人資料
 function renderProfile(user, container) {
     if (!user) return;
-    // 這裡修正了後端回傳可能是 created_at (PostgreSQL 預設) 的問題
     const createTime = user.created_at || user.createdAt; 
-    
     container.innerHTML = `
         <div class="profile-item" style="margin-bottom:15px;"><strong>姓名</strong><p>${user.name || '-'}</p></div>
         <div class="profile-item" style="margin-bottom:15px;"><strong>Email</strong><p>${user.email || '-'}</p></div>
@@ -40,12 +28,10 @@ function renderProfile(user, container) {
     `;
 }
 
-// 渲染訂單列表
 function renderOrders(orders, container) {
     if (!Array.isArray(orders) || !orders.length) {
         return setEmptyState(container, '目前還沒有訂單資料。');
     }
-    
     container.innerHTML = orders.map(order => `
         <div class="order-card" style="border:1px solid #eee; padding:15px; border-radius:8px; margin-bottom:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center">
@@ -54,88 +40,84 @@ function renderOrders(orders, container) {
                     ${order.orderStatus || '處理中'}
                 </span>
             </div>
-            <p class="muted" style="font-size:14px; color:#666; margin:5px 0;">付款狀態：${order.paymentStatus || '未付款'}</p>
             <p class="muted" style="font-size:14px; color:#666; margin:5px 0;">金額：${money(order.totalAmount)}</p>
-            <p class="muted" style="font-size:14px; color:#666; margin:5px 0;">建立時間：${formatDate(order.created_at || order.createdAt)}</p>
         </div>
     `).join('');
 }
 
-// --- 登出邏輯 ---
+// 修正：登出按鈕邏輯
 function handleLogout() {
     const logoutBtn = document.getElementById('logout-btn');
     const token = getToken();
-
     if (!logoutBtn) return;
 
     if (!token) {
-        logoutBtn.style.setProperty('display', 'none', 'important'); 
+        logoutBtn.style.display = 'none';
         return;
-    } else {
-        logoutBtn.style.display = 'block'; 
     }
 
-    // 移除舊的監聽器防止重複綁定
     logoutBtn.onclick = (e) => {
         e.preventDefault();
         if (confirm('確定要登出嗎？')) {
             localStorage.removeItem('token');
-            window.location.href = '/login.html'; // 登出後回登入頁
+            localStorage.removeItem('user');
+            localStorage.removeItem('userRole');
+            window.location.href = './login.html'; // 修正：使用相對路徑
         }
     };
 }
 
-// --- 主邏輯：載入會員資料 ---
 async function loadMemberProfile() {
     const profileContainer = document.getElementById('member-profile');
     const ordersContainer = document.getElementById('order-list');
     const token = getToken();
 
-    if (!profileContainer || !ordersContainer) return;
+    if (!profileContainer) return;
 
+    // 修正：如果沒 Token，直接跳轉，不要等 API 報錯
     if (!token) {
-        setEmptyState(profileContainer, '尚未登入，請先登入會員帳號。');
-        setEmptyState(ordersContainer, '登入後即可查看訂單紀錄。');
-        handleLogout();
+        alert("請先登入");
+        window.location.href = './login.html'; 
         return;
     }
 
     try {
-        // 使用 Promise.all 同時請求個人資訊與訂單
-        // 注意：API 加上了 API_BASE_URL 前綴
         const [meRes, orderRes] = await Promise.all([
             fetch(`${API_BASE_URL}/api/auth/me`, { 
-                headers: { 'Authorization': `Bearer ${token}` } 
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Bypass-Tunnel-Reminder': 'true' 
+                } 
             }),
             fetch(`${API_BASE_URL}/api/orders/my`, { 
-                headers: { 'Authorization': `Bearer ${token}` } 
-            }).catch(() => ({ ok: false })) // 預防訂單 API 還沒寫好
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Bypass-Tunnel-Reminder': 'true' 
+                } 
+            }).catch(() => ({ ok: false }))
         ]);
 
         const me = await meRes.json().catch(() => ({}));
-        
-        // 驗證登入狀態
+
         if (!meRes.ok || !me.success) {
-            throw new Error(me.message || '登入已失效');
+            // 只有當 Token 真的無效時才清除
+            if (meRes.status === 401 || meRes.status === 403) {
+                localStorage.removeItem('token');
+                window.location.href = './login.html';
+            }
+            throw new Error(me.message || '無法載入個人資料');
         }
 
-        // 渲染個人資料
         renderProfile(me.data, profileContainer);
-
-        // 處理訂單資料 (如果訂單 API 噴錯，給予空陣列)
         const myOrders = orderRes.ok ? await orderRes.json().catch(() => ({})) : { data: [] };
         renderOrders(myOrders.data || [], ordersContainer);
 
     } catch (error) {
-        console.error('載入失敗:', error);
-        localStorage.removeItem('token');
-        setEmptyState(profileContainer, '登入已失效，請重新登入。');
-        setEmptyState(ordersContainer, '請重新登入後查看資料。');
+        console.error('Account Error:', error);
+        // 不要隨便清除 token，除非確定是權限問題
+        setEmptyState(profileContainer, '伺服器連線失敗，請檢查後端狀態。');
     }
-    
-    // 執行登出按鈕顯示檢查
     handleLogout();
 }
 
-// 啟動
 document.addEventListener('DOMContentLoaded', loadMemberProfile);
