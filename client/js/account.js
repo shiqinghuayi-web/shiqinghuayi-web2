@@ -14,6 +14,17 @@ window.switchTab = function(event, tabName) {
 
 function getToken() { return localStorage.getItem('token'); }
 
+// ==========================================
+// 新增：讀取並更新右上角購物車數量
+// ==========================================
+function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
+function updateCartCount() {
+    const count = getCart().reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    document.querySelectorAll('#cart-count').forEach(el => {
+        el.textContent = count;
+    });
+}
+
 function setEmptyState(container, text) {
     if (container) container.innerHTML = `<div class="empty-state" style="padding:20px; color:#888; text-align:center;">${text}</div>`;
 }
@@ -37,9 +48,6 @@ function renderProfile(user, container) {
     `;
 }
 
-// ==========================================
-// 核心：渲染帶有「橫向進度條」與「明細」的訂單
-// ==========================================
 function renderOrders(orders, container) {
     if (!Array.isArray(orders) || !orders.length) {
         return setEmptyState(container, '目前還沒有訂單資料。趕快去選購喜歡的商品吧！');
@@ -51,11 +59,11 @@ function renderOrders(orders, container) {
         let items = [];
         try {
             items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
-        } catch(e) { console.error("商品解析失敗", e); }
+        } catch(e) {}
 
         const itemsHtml = items.map(item => `
-            <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
-                <span>${item.name} <span class="muted">× ${item.quantity}</span></span>
+            <div style="display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 10px; color: #333;">
+                <span>${item.name} <span style="color:var(--primary-strong); font-weight:bold;">× ${item.quantity}</span></span>
                 <span>${money(item.price * item.quantity)}</span>
             </div>
         `).join('');
@@ -100,9 +108,14 @@ function renderOrders(orders, container) {
 
                 <hr style="border: none; border-top: 1px dashed #eee; margin: 20px 0;">
 
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #888;">訂購明細</h4>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 16px; color: #555;">訂購明細</h4>
                     ${itemsHtml}
+                </div>
+                
+                <div style="font-size: 15px; color: #444; margin-bottom: 15px; line-height: 1.6;">
+                    <p style="margin: 0;"><strong>收件人：</strong>${order.receiver_name} (${order.receiver_phone})</p>
+                    <p style="margin: 0;"><strong>收貨地址：</strong>${order.receiver_address}</p>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #f5f5f5; padding-top: 15px;">
@@ -116,10 +129,28 @@ function renderOrders(orders, container) {
 
 function setupAuthNav() {
     const token = getToken();
+    const role = localStorage.getItem('userRole');
     const navBtns = document.querySelectorAll('.nav-auth-btn, #logout-btn, #sidebar-logout-btn');
     
-    navBtns.forEach(btn => {
-        if (token) {
+    if (token && role === 'admin') {
+        const navContainer = document.querySelector('.main-nav');
+        if (navContainer) {
+            navContainer.innerHTML = `
+                <a href="index.html">前台首頁</a>
+                <a href="admin.html">商品管理</a>
+                <a href="admin-orders.html">訂單管理</a>
+                <a href="#" id="admin-logout-btn">登出</a>
+            `;
+            document.getElementById('admin-logout-btn').onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.clear();
+                    window.location.href = 'index.html'; 
+                }
+            };
+        }
+    } else if (token) {
+        navBtns.forEach(btn => {
             btn.textContent = '登出';
             btn.href = '#';
             btn.style.display = 'block'; 
@@ -130,12 +161,8 @@ function setupAuthNav() {
                     window.location.href = 'index.html'; 
                 }
             };
-        } else {
-            if (btn.id === 'logout-btn' || btn.id === 'sidebar-logout-btn') {
-                btn.style.display = 'none';
-            }
-        }
-    });
+        });
+    }
 }
 
 async function loadMemberProfile() {
@@ -182,15 +209,18 @@ async function loadMemberProfile() {
         }
 
         renderProfile(me.data, profileContainer);
-        
-        // 渲染真實訂單
         const myOrders = orderRes.ok ? await orderRes.json().catch(() => ({})) : { data: [] };
         renderOrders(myOrders.data || [], ordersContainer);
 
     } catch (error) {
-        console.error('Account Error:', error);
         setEmptyState(profileContainer, '伺服器連線失敗，請檢查後端連線狀態。');
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadMemberProfile);
+// ==========================================
+// 修改這裡：載入時同時更新購物車數量與會員資料
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount(); 
+    loadMemberProfile();
+});
