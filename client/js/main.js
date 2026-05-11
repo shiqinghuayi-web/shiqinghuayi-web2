@@ -1,5 +1,5 @@
 /**
- * 拾情話憶 - main.js (終極優化版)
+ * 拾情話憶 - main.js (聲音按鈕優化版)
  */
 
 // --- 基礎工具函式 ---
@@ -29,26 +29,24 @@ function getProductCategory(product) {
 }
 function money(n) { return `NT$ ${Number(n || 0).toLocaleString()}`; }
 
-// --- 影片聲音控制與 Edge 相容性 ---
+// --- 聲音切換控制 (符號邏輯) ---
 function setupVideoSound() {
     const video = document.getElementById('hero-video');
     const unmuteBtn = document.getElementById('unmute-btn');
     if (!video || !unmuteBtn) return;
 
-    unmuteBtn.onclick = () => {
+    unmuteBtn.onclick = (e) => {
+        e.stopPropagation();
         if (video.muted) {
             video.muted = false;
-            unmuteBtn.innerHTML = '🔇 關閉聲音';
+            video.volume = 1.0;
+            video.play().catch(() => {});
+            unmuteBtn.textContent = '🔇'; // 切換成靜音符號 (點擊會關聲音)
         } else {
             video.muted = true;
-            unmuteBtn.innerHTML = '🔊 播放聲音';
+            unmuteBtn.textContent = '🔊'; // 切換成播放符號 (點擊會開聲音)
         }
     };
-
-    // 針對 Edge/Chrome 靜音播放政策的備援：使用者點擊頁面任何處時嘗試播放
-    document.addEventListener('click', () => {
-        if (video.paused) video.play();
-    }, { once: true });
 }
 
 // --- 畫面渲染邏輯 ---
@@ -111,12 +109,8 @@ async function loadFeaturedProducts() {
     if (!container) return;
 
     try {
-        // 加入 headers 防止 Edge 因為安全性阻擋請求
         const res = await fetch(`${API_BASE_URL}/api/products`, {
-            headers: { 
-                'Bypass-Tunnel-Reminder': 'true',
-                'Accept': 'application/json'
-            }
+            headers: { 'Bypass-Tunnel-Reminder': 'true' }
         });
         
         if (!res.ok) throw new Error('API 無法連線');
@@ -128,7 +122,6 @@ async function loadFeaturedProducts() {
             featuredProducts = window.mockProducts || [];
         }
     } catch (error) {
-        console.warn("Edge 偵測到連線異常或後端未啟動，切換至備援資料", error);
         featuredProducts = window.mockProducts || [];
     }
 
@@ -191,7 +184,6 @@ function setupCarousel() {
 
     if (!slide || imagesList.length === 0) return;
 
-    // 產生點點
     imagesList.forEach((_, i) => {
         const dot = document.createElement('span');
         dot.classList.add('dot');
