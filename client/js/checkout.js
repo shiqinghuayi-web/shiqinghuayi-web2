@@ -1,5 +1,5 @@
 
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
+
 
 function getCart() {
   return JSON.parse(localStorage.getItem('cart') || '[]');
