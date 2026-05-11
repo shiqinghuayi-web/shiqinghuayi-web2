@@ -1,34 +1,44 @@
+// --- 權限與導覽列切換邏輯 ---
 (function() {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
+    
+    // 阻擋非管理員
     if (!token || role !== 'admin') {
         alert('權限不足，請以管理員帳號登入。');
         window.location.href = 'index.html'; 
+        return;
     }
+
+    // 將導覽列的「登入」自動改為「登出」
+    const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
+    navAuthBtns.forEach(btn => {
+        btn.textContent = '登出';
+        btn.href = '#';
+        btn.onclick = (e) => {
+            e.preventDefault();
+            if (confirm('確定要登出嗎？')) {
+                localStorage.clear(); // 清除所有登入與購物車資料
+                window.location.href = 'index.html';
+            }
+        };
+    });
 })();
 
-const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; // 確保你的隧道網址正確
+const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
-// --- 基礎工具 ---
-function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
-function updateCartCount() {
-    const count = getCart().reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-    document.querySelectorAll('#cart-count').forEach(el => { el.textContent = count; });
-}
 function money(n) { return `NT$ ${Number(n || 0)}`; }
 
-// 核心修正：讀取伺服器上傳的圖片路徑
 function getProductImage(product) {
     const path = product?.image_url || product?.imageUrl;
     if (!path) return FALLBACK_IMAGE;
-    // 如果路徑包含 uploads，則補上後端 API 位址
     return path.includes('uploads') ? `${API_BASE_URL}/${path}` : path;
 }
 
-// --- 渲染邏輯 ---
+// --- 渲染商品卡片 (加上刪除按鈕) ---
 function createProductCard(product) {
-    const category = product?.category || '精選茶飲';
+    const category = typeof product.category === 'object' ? product.category.name : (product.category || '未分類');
     return `
     <article class="product-card">
       <div class="product-media">
@@ -42,13 +52,16 @@ function createProductCard(product) {
         </div>
         <div class="product-meta">庫存：${Number(product.stock || 0)}</div>
         <p class="muted">${product.description || ''}</p>
+        
+        <div style="margin-top: 15px; text-align: right;">
+          <button class="btn btn-outline" style="color: #d9534f; border-color: #d9534f; padding: 5px 15px;" onclick="deleteProduct('${product.id}')">刪除商品</button>
+        </div>
       </div>
     </article>
   `;
 }
 
-// --- API 請求 ---
-
+// --- API：載入商品 ---
 async function loadAdminProducts() {
     const list = document.getElementById('admin-product-list');
     if (!list) return;
@@ -59,10 +72,6 @@ async function loadAdminProducts() {
         const result = await res.json();
         let products = Array.isArray(result.data) ? result.data : [];
         
-        if (products.length === 0 && window.mockProducts) {
-            products = window.mockProducts;
-        }
-
         list.innerHTML = products.length 
             ? products.map(createProductCard).join('') 
             : '<div class="empty-state">目前沒有商品資料。</div>';
@@ -71,33 +80,59 @@ async function loadAdminProducts() {
     }
 }
 
-// 核心修正：使用 FormData 上傳檔案
-document.getElementById('admin-product-form')?.addEventListener('submit', async e => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+// --- API：新增商品 (修復 reset 錯誤) ---
+const formEl = document.getElementById('admin-product-form');
+if (formEl) {
+    formEl.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(formEl); // 安全抓取表單
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/products`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Bypass-Tunnel-Reminder': 'true'
+                },
+                body: formData 
+            });
+
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.message || '上架失敗');
+
+            alert('商品上架成功！');
+            formEl.reset(); // 安全重置表單
+            loadAdminProducts();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+}
+
+// --- API：刪除商品 ---
+window.deleteProduct = async (id) => {
+    if (!confirm('警告：確定要永久刪除這個商品嗎？')) return;
     const token = localStorage.getItem('token');
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/products`, {
-            method: 'POST',
+        const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+            method: 'DELETE',
             headers: { 
-                // 注意：上傳檔案時「不可以」設定 Content-Type，瀏覽器會自動處理
                 'Authorization': `Bearer ${token}`,
                 'Bypass-Tunnel-Reminder': 'true'
-            },
-            body: formData 
+            }
         });
-
-        const result = await res.json();
-        if (!res.ok || !result.success) throw new Error(result.message || '上架失敗');
-
-        alert('商品上架成功（含圖片已儲存）！');
-        e.currentTarget.reset();
-        loadAdminProducts();
+        
+        if (res.ok) {
+            alert('商品已成功刪除');
+            loadAdminProducts(); // 重新載入列表
+        } else {
+            alert('刪除失敗，請檢查後端日誌');
+        }
     } catch (error) {
-        alert(error.message);
+        alert('連線錯誤，無法刪除');
     }
-});
+};
 
-updateCartCount();
 loadAdminProducts();
