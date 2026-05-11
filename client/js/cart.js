@@ -1,4 +1,3 @@
-
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=1200&q=80";
 
 function getCart() {
@@ -111,7 +110,7 @@ function renderCart() {
 
   if (!cart.length) {
     cartItems.innerHTML = '<div class="empty-state">你的購物車目前是空的，先去挑幾樣喜歡的商品吧。</div>';
-    cartSummary.innerHTML = `<h3 style="margin-top:0">訂單摘要</h3><p class="muted">目前尚未加入商品</p><a class="btn full" href="/products.html">前往選購</a>`;
+    cartSummary.innerHTML = `<h3 style="margin-top:0">訂單摘要</h3><p class="muted">目前尚未加入商品</p><a class="btn full" href="products.html">前往選購</a>`;
     return;
   }
 
@@ -150,7 +149,7 @@ function renderCart() {
     <div class="summary-line"><span>運費</span><span>${shipping === 0 ? '免運' : money(shipping)}</span></div>
     <hr class="divider">
     <div class="summary-total"><span>總計</span><span>${money(total)}</span></div>
-    <a class="btn full" href="/checkout.html">前往結帳</a>
+    <a class="btn full" href="checkout.html">前往結帳</a>
   `;
 }
 
@@ -158,9 +157,10 @@ renderCart();
 window.changeItemQty = changeItemQty;
 window.removeItem = removeItem;
 
-// --- 全域導覽列：登入/登出狀態自動切換 ---
+// --- 全域導覽列：登入/登出與管理員切換 ---
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole'); 
     const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
     
     if (token) {
@@ -170,13 +170,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.onclick = (e) => {
                 e.preventDefault();
                 if (confirm('確定要登出嗎？')) {
-                    // 清除所有驗證資料，但保留購物車
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     localStorage.removeItem('userRole');
-                    window.location.href = 'index.html'; // 登出後強制回首頁
+                    window.location.href = 'index.html'; 
                 }
             };
         });
+
+        if (role === 'admin') {
+            const cartLinks = document.querySelectorAll('a[href="cart.html"], a[href="/cart.html"]');
+            cartLinks.forEach(link => {
+                link.innerHTML = '商品管理'; 
+                link.href = 'admin.html';    
+            });
+        }
     }
 });
