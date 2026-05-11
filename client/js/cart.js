@@ -157,3 +157,26 @@ function renderCart() {
 renderCart();
 window.changeItemQty = changeItemQty;
 window.removeItem = removeItem;
+
+// --- 全域導覽列：登入/登出狀態自動切換 ---
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
+    
+    if (token) {
+        navAuthBtns.forEach(btn => {
+            btn.textContent = '登出';
+            btn.href = '#';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    // 清除所有驗證資料，但保留購物車
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('userRole');
+                    window.location.href = 'index.html'; // 登出後強制回首頁
+                }
+            };
+        });
+    }
+});
