@@ -1,7 +1,6 @@
 /**
  * 拾情話憶 - 會員中心核心邏輯
  */
-const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 
 function getToken() { return localStorage.getItem('token'); }
 
