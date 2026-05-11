@@ -45,7 +45,7 @@ function renderOrders(orders, container) {
     `).join('');
 }
 
-// 核心：全域設定登出按鈕狀態
+// 設定登出按鈕
 function setupAuthNav() {
     const token = getToken();
     const navBtns = document.querySelectorAll('.nav-auth-btn, #logout-btn, #sidebar-logout-btn');
@@ -54,16 +54,15 @@ function setupAuthNav() {
         if (token) {
             btn.textContent = '登出';
             btn.href = '#';
-            btn.style.display = 'block'; // 確保側邊欄按鈕會顯示
+            btn.style.display = 'block'; 
             btn.onclick = (e) => {
                 e.preventDefault();
                 if (confirm('確定要登出嗎？')) {
                     localStorage.clear();
-                    window.location.href = './index.html'; // 登出後一律回首頁
+                    window.location.href = './index.html'; 
                 }
             };
         } else {
-            // 如果沒登入，隱藏專屬登出按鈕
             if (btn.id === 'logout-btn' || btn.id === 'sidebar-logout-btn') {
                 btn.style.display = 'none';
             }
@@ -72,7 +71,7 @@ function setupAuthNav() {
 }
 
 async function loadMemberProfile() {
-    setupAuthNav(); // 初始化右上角與側邊欄按鈕
+    setupAuthNav(); 
 
     const profileContainer = document.getElementById('member-profile');
     const ordersContainer = document.getElementById('order-list');
@@ -104,12 +103,13 @@ async function loadMemberProfile() {
 
         const me = await meRes.json().catch(() => ({}));
 
+        // 核心防護：發現任何異常，立刻終止並跳轉
         if (!meRes.ok || !me.success) {
-            if (meRes.status === 401 || meRes.status === 403) {
+            if (meRes.status === 401 || meRes.status === 403 || meRes.status === 404) {
                 localStorage.clear();
-                alert("登入已過期，請重新登入");
+                alert("登入狀態異常，請重新登入");
                 window.location.href = './login.html';
-                return;
+                return; // 加上 return，腳本就會在這裡停止，不會往下報錯！
             }
             throw new Error(me.message || '無法載入個人資料');
         }
