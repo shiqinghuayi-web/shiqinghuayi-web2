@@ -29,22 +29,28 @@ function getProductCategory(product) {
 }
 function money(n) { return `NT$ ${Number(n || 0).toLocaleString()}`; }
 
-// --- 聲音切換控制 (符號邏輯) ---
+// 請在 main.js 中尋找並替換 setupVideoSound 函式
 function setupVideoSound() {
     const video = document.getElementById('hero-video');
     const unmuteBtn = document.getElementById('unmute-btn');
     if (!video || !unmuteBtn) return;
 
+    // 確保一開始是靜音且按鈕顯示靜音符號
+    video.muted = true;
+    unmuteBtn.textContent = '🔇';
+
     unmuteBtn.onclick = (e) => {
         e.stopPropagation();
         if (video.muted) {
+            // 切換為：有聲音
             video.muted = false;
             video.volume = 1.0;
             video.play().catch(() => {});
-            unmuteBtn.textContent = '🔊'; // 切換成靜音符號 (點擊會關聲音)
+            unmuteBtn.textContent = '🔊'; // 符號代表：目前有聲音
         } else {
+            // 切換為：靜音
             video.muted = true;
-            unmuteBtn.textContent = '🔇'; // 切換成播放符號 (點擊會開聲音)
+            unmuteBtn.textContent = '🔇'; // 符號代表：目前靜音
         }
     };
 }
