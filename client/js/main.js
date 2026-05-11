@@ -176,35 +176,49 @@ if (nextBtn && prevBtn) {
 if (slide && imagesList.length > 0) startTimer();
 // --- 跑馬燈邏輯結束 ---
 
-// --- 全域導覽列：登入/登出與管理員切換 ---
+// --- 全域導覽列：登入/登出與管理員專屬選單 ---
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('userRole'); // 抓取身分
-    const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
+    const role = localStorage.getItem('userRole'); 
+    const navContainer = document.querySelector('.main-nav');
     
-    if (token) {
-        // 1. 把登入改登出
+    // 1. 如果是「管理員 (Admin)」，直接暴力替換整個導覽列！
+    if (token && role === 'admin') {
+        if (navContainer) {
+            const path = window.location.pathname;
+            const isIndex = path.includes('index.html') || path.endsWith('/');
+            const isProducts = path.includes('products.html');
+            const isAdmin = path.includes('admin.html');
+
+            navContainer.innerHTML = `
+                <a href="index.html" class="${isIndex ? 'active' : ''}">前台首頁</a>
+                <a href="products.html" class="${isProducts ? 'active' : ''}">商品頁</a>
+                <a href="admin.html" class="${isAdmin ? 'active' : ''}">商品管理</a>
+                <a href="#" id="admin-logout-btn">登出</a>
+            `;
+
+            document.getElementById('admin-logout-btn').onclick = (e) => {
+                e.preventDefault();
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.clear();
+                    window.location.href = 'index.html'; 
+                }
+            };
+        }
+    } 
+    // 2. 如果是「一般會員」，保留原本的導覽列，只把「登入」變「登出」
+    else if (token) {
+        const navAuthBtns = document.querySelectorAll('.nav-auth-btn');
         navAuthBtns.forEach(btn => {
             btn.textContent = '登出';
             btn.href = '#';
             btn.onclick = (e) => {
                 e.preventDefault();
                 if (confirm('確定要登出嗎？')) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('userRole');
+                    localStorage.clear();
                     window.location.href = 'index.html'; 
                 }
             };
         });
-
-        // 2. 如果是管理員，把購物車按鈕改成商品管理
-        if (role === 'admin') {
-            const cartLinks = document.querySelectorAll('a[href="cart.html"], a[href="/cart.html"]');
-            cartLinks.forEach(link => {
-                link.innerHTML = '商品管理'; 
-                link.href = 'admin.html';    
-            });
-        }
     }
 });
