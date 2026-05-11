@@ -6,7 +6,7 @@ const mockProducts = [
     description: '茶味清香，入口香甜甘口。',
     price: 550,
     stock: 10,
-    imageUrl: 'client/assets/images/product1.jpg',
+    imageUrl: 'client/assets/images/product101.jpg',
     category: '包種茶'
   },
   {
@@ -16,7 +16,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1880,
     stock: 10,
-    imageUrl: 'client/assets/images/product2.jpg',
+    imageUrl: 'client/assets/images/product102.jpg',
     category: '烏龍'
   },
   {
@@ -26,7 +26,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1500,
     stock: 10,
-    imageUrl: 'client/assets/images/product3.jpg',
+    imageUrl: 'client/assets/images/product103.jpg',
     category: '金萱'
   },
   {
@@ -36,7 +36,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 2280,
     stock: 10,
-    imageUrl: 'client/assets/images/product4.jpg',
+    imageUrl: 'client/assets/images/product104.jpg',
     category: '綠茶'
   },
   {
@@ -46,7 +46,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 2280,
     stock: 10,
-    imageUrl: 'client/assets/images/product5.jpg',
+    imageUrl: 'client/assets/images/product105.jpg',
     category: '綠茶'
   },
   {
@@ -56,7 +56,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 2580,
     stock: 10,
-    imageUrl: 'client/assets/images/product6.jpg',
+    imageUrl: 'client/assets/images/product106.jpg',
     category: '紅茶'
   },
   {
@@ -66,7 +66,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 2180,
     stock: 10,
-    imageUrl: 'client/assets/images/product7.jpg',
+    imageUrl: 'client/assets/images/product107.jpg',
     category: '綠茶'
   },
   {
@@ -76,7 +76,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1500,
     stock: 10,
-    imageUrl: 'client/assets/images/product8.jpg',
+    imageUrl: 'client/assets/images/product108.jpg',
     category: '綠茶'
   },
   {
@@ -86,7 +86,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1600,
     stock: 10,
-    imageUrl: 'client/assets/images/product9.jpg',
+    imageUrl: 'client/assets/images/product109.jpg',
     category: '綠茶'
   },
   {
@@ -96,7 +96,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1600,
     stock: 10,
-    imageUrl: 'client/assets/images/product10.jpg',
+    imageUrl: 'client/assets/images/product110.jpg',
     category: '烏龍'
   },
   {
@@ -106,7 +106,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1800,
     stock: 10,
-    imageUrl: 'client/assets/images/product11.jpg',
+    imageUrl: 'client/assets/images/product111.jpg',
     category: '綠茶'
   },
   {
@@ -116,7 +116,7 @@ const mockProducts = [
     description: '自然纖維質感搭配柔和綠調，適合日常外出與週末散步。',
     price: 1500,
     stock: 10,
-    imageUrl: 'client/assets/images/product12.jpg',
+    imageUrl: 'client/assets/images/product112.jpg',
     category: '紅茶'
   }
 ];
