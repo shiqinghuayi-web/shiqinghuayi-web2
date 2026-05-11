@@ -34,21 +34,21 @@
       <div class="account-layout">
         <aside class="account-sidebar">
           <h3 style="margin:0 0 4px;font-family:var(--font-display);font-size:34px;color:var(--primary-strong)">會員功能</h3>
-          <a class="account-link active" href="#">個人資料</a>
-          <a class="account-link" href="#">我的訂單</a>
+          <a class="account-link active" href="#" onclick="switchTab(event, 'profile')">個人資料</a>
+          <a class="account-link" href="#" onclick="switchTab(event, 'orders')">我的訂單</a>
           <a class="account-link" href="cart.html">購物車</a>
           <a class="account-link" href="#" id="sidebar-logout-btn" style="color: #d9534f; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">登出帳號</a>
         </aside>
 
         <section class="account-content">
-          <div class="panel-card">
+          <div id="tab-profile" class="panel-card tab-content">
             <h2>個人資料</h2>
             <div id="member-profile" class="profile-grid">
               <p>資料載入中...</p>
             </div>
           </div>
 
-          <div class="panel-card">
+          <div id="tab-orders" class="panel-card tab-content" style="display:none;">
             <h2>訂單紀錄</h2>
             <div id="order-list" class="order-list">
               <p style="color: #888;">目前尚沒有訂單資料。</p>
