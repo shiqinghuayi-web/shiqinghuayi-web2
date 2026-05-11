@@ -3,7 +3,7 @@
  */
 
 // 1. 基礎配置：請確保此 IP 與 B 電腦主機 IP 一致
-const API_BASE_URL = 'https://shiqingbackend30678.loca.lt'; 
+const API_BASE_URL = 'https://643df25ad9157656-39-12-34-105.serveousercontent.com'; 
 
 // --- 工具函式 ---
 function getToken() {
